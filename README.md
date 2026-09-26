@@ -1,52 +1,68 @@
-# E-Helper v1.0.0 ⚡
+# E-Helper v1.0.0
 
-> Casper Excalibur dizüstü bilgisayarlar için hafif, açık kaynaklı ve yüksek performanslı sistem yönetim aracı.
-
----
-
-## 📖 Genel Bakış
-
-**E-Helper**, resmi Excalibur Control Center yazılımının yüksek kaynak tüketen, hantal ve kararsız yapısına alternatif olarak geliştirilmiş bağımsız bir kontrol merkezidir. ASUS ekosistemindeki **G-Helper** felsefesiyle inşa edilmiştir:
-
-- 🪶 **Hafif ve Hızlı:** Sıfır arka plan servisi, minimum RAM (~25-35 MB) ve sıfıra yakın CPU tüketimi.
-- 📦 **Taşınabilir (Portable):** Kurulum gerektirmeyen tek çalıştırılabilir dosya mimarisi.
-- 🛡️ **Doğrudan Donanım Erişimi:** Resmi hantal DLL kütüphanelerine bağımlı olmadan, doğrudan yerel Windows ACPI WMI SMI (`RW_GMWMI`) köprüsü üzerinden donanım denetimi.
+Casper Excalibur dizüstü bilgisayarlar için geliştirilmiş açık kaynaklı, hafif ve taşınabilir sistem yönetim aracı.
 
 ---
 
-## ✨ Temel Özellikler
+## Genel Bakış
 
-### 1. 🎛️ Sistem Tepsisi ve Kompakt Panel (G-Helper Ergonomisi)
-- Windows görev çubuğunda pencere kaplamaz; doğrudan **Gizli Simgeler (System Tray)** alanına yerleşir.
-- Simgeye tıklandığında ekranın sağ alt köşesinde (tarih/saat üstünde) kompakt, modern karanlık temalı panel açılır.
-- Panel dışına tıklandığında kendiliğinden otomatik olarak gizlenir (*Auto-hide*).
+E-Helper, resmi Excalibur Control Center yazılımının kararsız, yüksek kaynak tüketen ve hantal yapısına alternatif olarak geliştirilmiştir. ASUS ekosistemindeki G-Helper yaklaşımını temel alır:
 
-### 2. ⚡ Performans Profilleri (Tek Tıkla Geçiş)
-- 🍃 **Ofis / Sessiz (Office):** Düşük fan devri ve güç tasarrufu modu.
-- ⚖️ **Dengeli / Oyun (Gaming):** Optimize edilmiş dinamik fan ve güç dengesi.
-- 🚀 **Yüksek Performans (High Performance):** Maksimum soğutma ve tam güç limiti.
-- *Windows güç planları (`PowerSetActiveScheme`) ile anlık senkronizasyon.*
+- **Hafif ve Optimize:** Arka plan servisi barındırmaz, ortalama 25-35 MB RAM ve sıfıra yakın CPU tüketir.
+- **Taşınabilir (Portable):** Kurulum gerektirmeyen tek bir `EHelper.exe` dosyasından çalışır.
+- **Doğrudan Donanım Köprüsü:** Harici üçüncü parti DLL kütüphanelerine bağımlı olmadan, doğrudan Windows yerel WMI ACPI SMI (`RW_GMWMI`) kanalı üzerinden gömülü denetleyiciyle (EC/BIOS) haberleşir.
 
-### 3. 📊 Canlı Donanım Telemetrisi (3 Saniyede Bir)
-- Anlık CPU ve GPU sıcaklıkları (°C) ile dinamik renk uyarıları (Yeşil / Turuncu / Kırmızı).
+---
+
+## Temel Özellikler
+
+### Sistem Tepsisi ve Kompakt Panel
+- Görev çubuğunda pencere kaplamaz; doğrudan Windows Gizli Simgeler (System Tray) alanına yerleşir.
+- Tepsi simgesine tıklandığında ekranın sağ alt köşesinde kompakt bir yönetim paneli açılır.
+- Panel dışına tıklandığında otomatik olarak gizlenir (*Auto-hide*).
+
+### Performans Profilleri
+- **Ofis / Sessiz (Office):** Düşük fan devri ve güç tasarrufu modu.
+- **Dengeli / Oyun (Gaming):** Dengeli güç ve akıllı soğutma modu.
+- **Yüksek Performans (High Performance):** Tam güç limiti ve maksimum soğutma.
+- Windows güç planlarıyla (`PowerSetActiveScheme`) otomatik senkronize çalışır.
+
+### Donanım Telemetrisi (3 Saniyede Bir)
+- Anlık CPU ve GPU sıcaklıkları (°C).
 - Anlık CPU ve GPU fan devirleri (RPM).
 - Destekleyen modellerde 3. sistem fanı telemetrisi.
 
-### 4. 🌈 Klavye RGB Aydınlatma Yönetimi
-- **Işık Modları:** Sabit (Static), Nefes Alma (Breathing), Renk Döngüsü (Cycle), Kapalı (Off).
-- **Parlaklık Ayarı:** 0 - 4 kademe seviye denetimi.
-- **Hızlı Renkler & HEX Desteği:** Popüler neon preset renkler ve özel HEX renk kodu tanımlama.
+### Klavye RGB Aydınlatma Denetimi
+- **Modlar:** Sabit (Static), Nefes Alma (Breathing), Renk Döngüsü (Cycle), Kapalı (Off).
+- **Parlaklık:** 0 ile 4 kademe arası parlaklık ayarı.
+- **Renk Seçimi:** Hazır renk paleti ve özel HEX renk kodu tanımlama desteği.
 
-### 5. 💾 Anlık ve Otomatik Kaydetme
-- "Kaydet" veya "Uygula" butonu yoktur. Yapılan tüm değişiklikler anında donanıma iletilir ve yerel yapılandırmaya yazılır.
+### Reaktif Ayar Yönetimi
+- "Kaydet" veya "Uygula" butonu yoktur. Yapılan tüm değişiklikler anında donanıma iletilir ve `%LocalAppData%\EHelper\config.json` dosyasına kaydedilir.
 
 ---
 
-## 🛠️ Mimari & Teknoloji Yığını
+## İndirme ve Kullanım
+
+### 1. İndirme
+GitHub sayfasında yer alan **Releases** bölümünden en güncel `EHelper.exe` dosyasını indirin. Kurulum veya yükleme sihirbazı gerekmez.
+
+### 2. Çalıştırma
+* Donanım seviyesinde fan, sıcaklık ve aydınlatma kontrolü Windows WMI ACPI arayüzünü kullandığı için `EHelper.exe` dosyasına **Sağ Tık -> Yönetici Olarak Çalıştır** seçeneğiyle izin verilmesi gereklidir (uygulama bildiriminde otomatik yönetici yetkisi istenir).
+* Program açıldığında doğrudan Windows bildirim alanındaki **Gizli Simgeler** içerisine yerleşir.
+
+### 3. Kullanım
+* Sağ altta yer alan `E` simgesine sol tıklayarak kontrol panelini açabilirsiniz.
+* Ayarlarınızı değiştirdikten sonra panel dışındaki herhangi bir yere tıkladığınızda arayüz kendiliğinden gizlenecektir.
+* Bilgisayar her açıldığında otomatik başlamasını isterseniz arayüzdeki **"Windows ile Birlikte Başlat"** kutucuğunu işaretleyebilirsiniz.
+
+---
+
+## Mimari Yapı
 
 ```
 +-------------------------------------------------------------------+
-|                     E-Helper WPF UI / Tray                        |
+|                     E-Helper WPF / Tray Arayüzü                   |
 +-------------------------------------------------------------------+
                                   |
                                   v
@@ -57,39 +73,34 @@
                                   v
 +-------------------------------------------------------------------+
 |       WMI Servis Katmanı: "root\wmi" -> "RW_GMWMI"                 |
-|       (BufferBytes: 32-byte SMI_STRUCT_S Binary Data)             |
+|       (32-bayt SMI_STRUCT_S Binary Protokolü)                     |
 +-------------------------------------------------------------------+
                                   |
                                   v
 +-------------------------------------------------------------------+
-|        ACPI BIOS / EC (Embedded Controller) Donanımı              |
+|          ACPI BIOS / EC (Embedded Controller) Donanımı            |
 +-------------------------------------------------------------------+
 ```
 
-- **Dil & Platform:** C# / .NET 8.0 (WindowsDesktop / WPF + WinForms Tray)
-- **Donanım Katmanı:** `System.Management` WMI ACPI SMI (`0xFA00` / `0xFB00` protokolü)
-- **Model Tespiti:** Excalibur G920, G870, G770 otomatik donanım algılama
-
 ---
 
-## 🚀 Derleme ve Çalıştırma
+## Kaynak Koddan Derleme
 
-### Gereksinimler
-- Windows 10 / 11 (64-bit)
-- .NET 8.0 SDK veya üstü
-- Yönetici İzinleri (WMI ACPI donanım erişimi için gereklidir)
+Tek dosya çalıştırılabilir `EHelper.exe` oluşturmak için:
 
-### Geliştirme Ortamında Derleme
 ```powershell
 # Depoyu klonlayın
 git clone https://github.com/berkevnl/e-helper.git
 cd e-helper
 
-# Projeyi derleyin
-dotnet build src/EHelper/EHelper.csproj -c Release
+# Tek dosya (Single-File) olarak yayımlayın
+dotnet publish src/EHelper/EHelper.csproj -c Release -o publish/
 ```
 
-### Tek Dosya (Portable Single-File) Yayımlama
-```powershell
-dotnet publish src/EHelper/EHelper.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/
-```
+Derleme tamamlandığında `publish/EHelper.exe` dosyası tek başına taşınabilir olarak kullanıma hazırdır.
+
+---
+
+## Lisans
+
+Bu proje GNU General Public License v3.0 (GPL-3.0) ile lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakabilirsiniz.

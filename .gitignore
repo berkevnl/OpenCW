@@ -5,6 +5,7 @@ excalibur_hardware_control_analysis.md
 # Build and IDE artifacts
 bin/
 obj/
+publish/
 [Dd]ebug/
 [Rr]elease/
 x64/
