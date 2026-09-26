@@ -17,8 +17,21 @@ if (-not (Test-Path $CertsDir)) {
     New-Item -ItemType Directory -Force -Path $CertsDir | Out-Null
 }
 
+# Clean previous output
+if (Test-Path $StandaloneDir) {
+    Get-ChildItem -Path $StandaloneDir | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+} else {
+    New-Item -ItemType Directory -Force -Path $StandaloneDir | Out-Null
+}
+
+if (Test-Path $FrameworkDir) {
+    Get-ChildItem -Path $FrameworkDir | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+} else {
+    New-Item -ItemType Directory -Force -Path $FrameworkDir | Out-Null
+}
+
 Write-Host "==> [1/3] Building E-Helper Standalone Single-File..." -ForegroundColor Cyan
-dotnet publish $ProjectPath -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o $StandaloneDir
+dotnet publish $ProjectPath -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o $StandaloneDir
 
 Write-Host "==> [2/3] Building E-Helper Framework-Dependent..." -ForegroundColor Cyan
 dotnet publish $ProjectPath -c Release -r win-x64 --self-contained false -o $FrameworkDir
@@ -85,6 +98,13 @@ if (-not $SkipSign) {
     Write-Host "==> Framework Signature:  $($sigFramework.SignerCertificate.Subject) [Status: $($sigFramework.Status)]" -ForegroundColor Green
 }
 
+# Generate Release ZIP for Standalone
+$zipPath = "$StandaloneDir\EHelper-v1.1.0-win-x64.zip"
+Write-Host "==> Creating Standalone Release ZIP: $zipPath" -ForegroundColor Cyan
+if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+Compress-Archive -Path $StandaloneExe -DestinationPath $zipPath -Force
+
 Write-Host "==> Build & Digital Signing complete!" -ForegroundColor Green
 Write-Host "    Standalone Output: $StandaloneExe"
+Write-Host "    Standalone ZIP:    $zipPath"
 Write-Host "    Framework Output:  $FrameworkExe"

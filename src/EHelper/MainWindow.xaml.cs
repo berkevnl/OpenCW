@@ -571,7 +571,7 @@ namespace EHelper
                     string? exePath = Environment.ProcessPath;
                     if (!string.IsNullOrEmpty(exePath))
                     {
-                        key.SetValue(AppName, $"\"{exePath}\"");
+                        key.SetValue(AppName, $"\"{exePath}\" --autostart");
                     }
                 }
                 else

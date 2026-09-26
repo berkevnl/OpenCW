@@ -11,7 +11,10 @@ namespace EHelper
     public partial class App : System.Windows.Application
     {
         private const string AppMutexName = "EHelper_SingleInstance_Mutex_Excalibur";
+        private const string ShowWindowEventName = "EHelper_Show_Window_Event_Excalibur";
         private Mutex? _mutex;
+        private EventWaitHandle? _showEvent;
+        private RegisteredWaitHandle? _waitHandleRegistration;
         private IHardwareBridge? _bridge;
         private HardwareMonitorService? _monitor;
         private SystemTrayManager? _trayManager;
@@ -51,12 +54,27 @@ namespace EHelper
             _mutex = new Mutex(true, AppMutexName, out bool isNewInstance);
             if (!isNewInstance)
             {
-                System.Windows.MessageBox.Show(
-                    "E-Helper zaten arka planda çalışıyor. Sistem tepsisindeki (Gizli Simgeler) simgeye tıklayabilirsiniz.",
-                    "E-Helper",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information
-                );
+                try
+                {
+                    if (EventWaitHandle.TryOpenExisting(ShowWindowEventName, out var existingEvent))
+                    {
+                        existingEvent.Set();
+                        existingEvent.Dispose();
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show(
+                            "E-Helper zaten arka planda çalışıyor. Sistem tepsisindeki (Gizli Simgeler) simgeye tıklayabilirsiniz.",
+                            "E-Helper",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information
+                        );
+                    }
+                }
+                catch
+                {
+                    // Fallback if IPC event cannot be reached
+                }
                 Shutdown();
                 return;
             }
@@ -73,7 +91,7 @@ namespace EHelper
                 // 3. Initialize Hardware Telemetry Service (do not start yet)
                 _monitor = new HardwareMonitorService(_bridge, config.CurrentSettings.PollingIntervalSeconds);
 
-                // 4. Initialize Main Flyout Window (stays hidden until tray icon clicked)
+                // 4. Initialize Main Flyout Window (stays hidden until tray icon clicked or shown)
                 _mainWindow = new MainWindow(_bridge, isSimulated, config, _monitor);
 
                 // 5. Initialize System Tray (Notification Area Icon)
@@ -110,6 +128,54 @@ namespace EHelper
                 // 7. Start Telemetry Service after all UI & Tray objects are ready
                 _monitor.Start();
 
+                // 8. Register IPC event to allow subsequent launches to activate this window
+                try
+                {
+                    _showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowWindowEventName);
+                    _waitHandleRegistration = ThreadPool.RegisterWaitForSingleObject(_showEvent, (state, timedOut) =>
+                    {
+                        Dispatcher.InvokeAsync(() =>
+                        {
+                            if (_mainWindow != null)
+                            {
+                                if (!_mainWindow.IsVisible)
+                                {
+                                    _mainWindow.ToggleFlyout();
+                                }
+                                else
+                                {
+                                    _mainWindow.Activate();
+                                    _mainWindow.Focus();
+                                }
+                            }
+                        });
+                    }, null, -1, false);
+                }
+                catch
+                {
+                    // Non-critical IPC event failure
+                }
+
+                // 9. If started interactively (not via Windows autostart), show flyout immediately
+                bool startMinimized = false;
+                if (e.Args != null)
+                {
+                    foreach (var arg in e.Args)
+                    {
+                        if (arg.Equals("--autostart", StringComparison.OrdinalIgnoreCase) ||
+                            arg.Equals("--minimized", StringComparison.OrdinalIgnoreCase))
+                        {
+                            startMinimized = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!startMinimized)
+                {
+                    _mainWindow.ToggleFlyout();
+                }
+
                 // Initial working set trim to drop memory to G-Helper levels (~2-5 MB)
                 MemoryOptimizer.TrimMemory();
             }
@@ -129,6 +195,8 @@ namespace EHelper
         {
             try
             {
+                _waitHandleRegistration?.Unregister(null);
+                _showEvent?.Dispose();
                 _monitor?.Stop();
                 _monitor?.Dispose();
                 _trayManager?.Dispose();
