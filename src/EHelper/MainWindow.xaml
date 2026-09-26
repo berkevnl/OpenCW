@@ -185,15 +185,15 @@
                 <!-- Section Header Row: Title on Left | CPU Temp & RPM on Right -->
                 <Grid Margin="0,0,0,8">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="⚡" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="⚡" FontSize="12" Foreground="{DynamicResource TextPrimary}" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock x:Name="TxtPowerModeTitle" Text="Performans Modu: Dengeli" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <TextBlock Text="CPU: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
-                        <TextBlock x:Name="TxtCpuTemp" Text="53°C" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="TxtCpuTemp" Text="--°C" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,8,0"/>
                         <TextBlock Text="Fan: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
-                        <TextBlock x:Name="TxtCpuRpm" Text="1900RPM" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                        <TextBlock x:Name="TxtCpuRpm" Text="--RPM" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
                     </StackPanel>
                 </Grid>
 
@@ -210,24 +210,24 @@
                     <!-- Sessiz Button -->
                     <Button x:Name="BtnModeOffice" Grid.Column="0" Style="{StaticResource GHelperTileStyle}" Click="BtnModeOffice_Click">
                         <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="🚲" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                            <TextBlock Text="Sessiz" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock Text="🚲" FontSize="18" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock x:Name="TxtModeOfficeLabel" Text="Sessiz" FontSize="12" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
                     <!-- Dengeli Button -->
                     <Button x:Name="BtnModeGaming" Grid.Column="2" Style="{StaticResource ActiveGHelperTileStyle}" Click="BtnModeGaming_Click">
                         <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="🚗" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                            <TextBlock Text="Dengeli" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock Text="🚗" FontSize="18" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock x:Name="TxtModeGamingLabel" Text="Dengeli" FontSize="12" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
                     <!-- Turbo (Performans) Button -->
                     <Button x:Name="BtnModeHighPerf" Grid.Column="4" Style="{StaticResource GHelperTileStyle}" Click="BtnModeHighPerf_Click">
                         <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="🚀" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                            <TextBlock Text="Turbo" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock Text="🚀" FontSize="18" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock x:Name="TxtModeHighPerfLabel" Text="Turbo" FontSize="12" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </Grid>
@@ -238,15 +238,15 @@
                 <!-- Section Header Row: Title on Left | GPU Temp & RPM on Right -->
                 <Grid Margin="0,0,0,8">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="🎮" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="GPU Modu: Ayrık / Hibrit" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
+                        <TextBlock Text="🎮" FontSize="12" Foreground="{DynamicResource TextPrimary}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtGpuHeader" Text="GPU Modu: Ayrık / Hibrit" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <TextBlock Text="GPU: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
-                        <TextBlock x:Name="TxtGpuTemp" Text="43°C" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="TxtGpuTemp" Text="--°C" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,8,0"/>
                         <TextBlock Text="Fan: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
-                        <TextBlock x:Name="TxtGpuRpm" Text="2200RPM" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                        <TextBlock x:Name="TxtGpuRpm" Text="--RPM" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
                     </StackPanel>
                 </Grid>
 
@@ -257,9 +257,9 @@
                         <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ProgressBar x:Name="PbCpuTemp" Grid.Column="0" Height="3" Value="53" Maximum="100" 
+                    <ProgressBar x:Name="PbCpuTemp" Grid.Column="0" Height="3" Value="0" Maximum="100" 
                                  Foreground="{DynamicResource AccentBlue}" Background="{DynamicResource ProgressTrack}" BorderThickness="0"/>
-                    <ProgressBar x:Name="PbGpuTemp" Grid.Column="2" Height="3" Value="43" Maximum="100" 
+                    <ProgressBar x:Name="PbGpuTemp" Grid.Column="2" Height="3" Value="0" Maximum="100" 
                                  Foreground="{DynamicResource AccentBlue}" Background="{DynamicResource ProgressTrack}" BorderThickness="0"/>
                 </Grid>
             </StackPanel>
@@ -268,11 +268,9 @@
             <StackPanel Grid.Row="3" Margin="0,0,0,14">
                 <Grid Margin="0,0,0,8">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="📊" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Sistem Kaynakları" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
+                        <TextBlock Text="📊" FontSize="12" Foreground="{DynamicResource TextPrimary}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtSysResourcesHeader" Text="Sistem Kaynakları" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
                     </StackPanel>
-
-                    <TextBlock x:Name="TxtSysSummary" Text="Aktif İzleme" FontSize="11" Foreground="{DynamicResource TextMuted}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 </Grid>
 
                 <!-- 2 Compact Resource Tiles -->
@@ -287,7 +285,7 @@
                     <Border Grid.Column="0" Background="{DynamicResource TileBg}" BorderBrush="{DynamicResource TileBorder}" BorderThickness="1" CornerRadius="4" Padding="10,8">
                         <StackPanel>
                             <Grid Margin="0,0,0,4">
-                                <TextBlock Text="RAM Bellek" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
+                                <TextBlock x:Name="TxtRamHeader" Text="RAM Bellek" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
                                 <TextBlock x:Name="TxtRamPercent" Text="--%" HorizontalAlignment="Right" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AccentGreen}"/>
                             </Grid>
                             <TextBlock x:Name="TxtRamUsage" Text="-- / -- GB" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
@@ -300,7 +298,7 @@
                     <Border Grid.Column="2" Background="{DynamicResource TileBg}" BorderBrush="{DynamicResource TileBorder}" BorderThickness="1" CornerRadius="4" Padding="10,8">
                         <StackPanel>
                             <Grid Margin="0,0,0,4">
-                                <TextBlock Text="SSD Disk (C:)" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
+                                <TextBlock x:Name="TxtSsdHeader" Text="SSD Disk (C:)" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
                                 <TextBlock x:Name="TxtSsdPercent" Text="--%" HorizontalAlignment="Right" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AccentBlue}"/>
                             </Grid>
                             <TextBlock x:Name="TxtSsdUsage" Text="-- / -- GB" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
@@ -315,13 +313,13 @@
             <StackPanel Grid.Row="4" Margin="0,0,0,14">
                 <Grid Margin="0,0,0,8">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="⌨" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Laptop Klavyesi" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
+                        <TextBlock Text="⌨" FontSize="12" Foreground="{DynamicResource TextPrimary}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtKeyboardHeader" Text="Laptop Klavyesi" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <TextBlock Text="Parlaklık: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
-                        <TextBlock x:Name="TxtBrightnessValue" Text="3" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                        <TextBlock x:Name="LblBrightnessHeader" Text="Parlaklık: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
+                        <TextBlock x:Name="TxtBrightnessIcon" Text="🔆" FontSize="14" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
 
@@ -330,7 +328,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="4"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1.1*"/>
                         <ColumnDefinition Width="4"/>
                         <ColumnDefinition Width="1.2*"/>
                         <ColumnDefinition Width="4"/>
@@ -338,7 +336,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Button x:Name="BtnLedStatic" Grid.Column="0" Content="Sabit" Style="{StaticResource ActiveGHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedStatic_Click"/>
-                    <Button x:Name="BtnLedBreathing" Grid.Column="2" Content="Nefes" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedBreathing_Click"/>
+                    <Button x:Name="BtnLedBreathing" Grid.Column="2" Content="💨 Nefes" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedBreathing_Click"/>
                     <Button x:Name="BtnLedDynamic" Grid.Column="4" Content="🌈 Dinamik" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedDynamic_Click"/>
                     <Button x:Name="BtnLedOff" Grid.Column="6" Content="Kapalı" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedOff_Click"/>
                 </Grid>
@@ -350,10 +348,10 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Işık Gücü" FontSize="11" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="LblBrightnessTitle" Text="Parlaklık" FontSize="11" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Center"/>
                     <Slider x:Name="SliderBrightness" Grid.Column="1" Margin="10,0" Minimum="0" Maximum="4" Value="3" 
                             TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" ValueChanged="SliderBrightness_ValueChanged"/>
-                    <Border x:Name="BrdCurrentColor" Grid.Column="2" Width="18" Height="18" CornerRadius="3" Background="#00B4D8" BorderBrush="#555555" BorderThickness="1"/>
+                    <TextBlock x:Name="TxtBrightnessSliderIcon" Grid.Column="2" Text="🔆" FontSize="14" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                 </Grid>
 
                 <!-- Color Palette (Only shown in Static and Breathing modes) -->
@@ -366,7 +364,7 @@
 
                     <!-- Interactive Spectrum Bar -->
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="Renk Yelpazesi" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3"/>
+                        <TextBlock x:Name="TxtSpectrumTitle" Text="Renk Yelpazesi" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3"/>
                         <Border x:Name="BrdSpectrum" Height="26" CornerRadius="3" Cursor="Hand" 
                                 MouseDown="Spectrum_MouseDown" MouseMove="Spectrum_MouseMove" BorderBrush="{DynamicResource TileBorder}" BorderThickness="1">
                             <Border.Background>
@@ -385,7 +383,7 @@
 
                     <!-- Quick Preset Colors -->
                     <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                        <TextBlock Text="Hazır Renkler" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3"/>
+                        <TextBlock x:Name="TxtPresetsTitle" Text="Hazır Renkler" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3"/>
                         <UniformGrid Columns="4" Rows="2">
                             <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#00E5FF" ToolTip="Cyan" Tag="#00E5FF" Click="ColorPreset_Click"/>
                             <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#0090FF" ToolTip="Mavi" Tag="#0090FF" Click="ColorPreset_Click"/>
@@ -400,20 +398,23 @@
                 </Grid>
             </StackPanel>
 
-            <!-- 5: System Settings (Startup Checkbox & Status) -->
-            <Grid Grid.Row="5" Margin="0,0,0,14">
+            <!-- 5: System Settings (Startup Checkbox & Updates) -->
+            <StackPanel Grid.Row="5" Margin="0,0,0,10">
                 <CheckBox x:Name="ChkAutoStart" Content="Başlangıçta Çalıştır" 
                           Foreground="{DynamicResource TextPrimary}" FontSize="12" 
                           VerticalContentAlignment="Center" Checked="ChkAutoStart_Changed" Unchecked="ChkAutoStart_Changed"/>
+                <Button x:Name="BtnCheckUpdates" Content="🔄 Güncellemeleri Kontrol Et" Style="{StaticResource FooterBtnStyle}" 
+                        HorizontalAlignment="Left" Margin="0,8,0,0" Padding="10,6" Click="BtnCheckUpdates_Click"/>
+            </StackPanel>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Ellipse x:Name="DotStatus" Width="7" Height="7" Fill="{DynamicResource AccentGreen}" Margin="0,0,5,0"/>
-                    <TextBlock x:Name="TxtHardwareStatus" Text="WMI ACPI • Aktif" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
-                </StackPanel>
+            <!-- 6: Language row positioned directly above Exit button -->
+            <Grid Grid.Row="6" Margin="0,2,0,6">
+                <Button x:Name="BtnLangToggle" Content="🌐 EN" HorizontalAlignment="Right" Style="{StaticResource FooterBtnStyle}" 
+                        Padding="10,4" FontSize="11" ToolTip="Dili Değiştir / Change Language" Click="BtnLangToggle_Click"/>
             </Grid>
 
             <!-- 7: Footer Action Buttons (G-Helper bottom strip) -->
-            <Grid Grid.Row="7" Margin="0,6,0,0">
+            <Grid Grid.Row="7" Margin="0,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="6"/>

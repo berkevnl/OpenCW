@@ -14,6 +14,7 @@ namespace EHelper.Config
         public bool StartWithWindows { get; set; } = false;
         public int PollingIntervalSeconds { get; set; } = 3;
         public bool IsDarkTheme { get; set; } = true;
+        public string Language { get; set; } = "TR";
 
         [JsonIgnore]
         public string HexColor => $"#{Red:X2}{Green:X2}{Blue:X2}";

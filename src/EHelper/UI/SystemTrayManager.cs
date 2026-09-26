@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using EHelper.Hardware;
+using EHelper.Services;
 
 namespace EHelper.UI
 {
@@ -32,22 +33,30 @@ namespace EHelper.UI
         {
             var menu = new ContextMenuStrip();
 
-            var openItem = new ToolStripMenuItem("E-Helper'ı Aç", null, (s, e) =>
+            menu.Opening += (s, e) =>
             {
-                _mainWindow.Dispatcher.Invoke(() => _mainWindow.ToggleFlyout());
-            })
-            {
-                Font = new Font(menu.Font, System.Drawing.FontStyle.Bold)
+                menu.Items.Clear();
+
+                string openText = LocalizationManager.IsTurkish ? "E-Helper'ı Aç" : "Open E-Helper";
+                string exitText = LocalizationManager.IsTurkish ? "Çıkış" : "Exit";
+
+                var openItem = new ToolStripMenuItem(openText, null, (o, ev) =>
+                {
+                    _mainWindow.Dispatcher.Invoke(() => _mainWindow.ToggleFlyout());
+                })
+                {
+                    Font = new Font(menu.Font, System.Drawing.FontStyle.Bold)
+                };
+
+                var exitItem = new ToolStripMenuItem(exitText, null, (o, ev) =>
+                {
+                    _onExit();
+                });
+
+                menu.Items.Add(openItem);
+                menu.Items.Add(new ToolStripSeparator());
+                menu.Items.Add(exitItem);
             };
-
-            var exitItem = new ToolStripMenuItem("Çıkış", null, (s, e) =>
-            {
-                _onExit();
-            });
-
-            menu.Items.Add(openItem);
-            menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add(exitItem);
 
             _notifyIcon.ContextMenuStrip = menu;
         }

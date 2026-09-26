@@ -60,23 +60,18 @@ namespace EHelper
             _blue = s.Blue;
             _isDarkTheme = s.IsDarkTheme;
 
-            // Apply Theme
+            // Load Language
+            LocalizationManager.CurrentLanguage = s.Language ?? "TR";
+
+            // Apply Theme & Localization
             ApplyTheme(_isDarkTheme);
+            ApplyLocalization();
 
             // UI Initial Values
             TxtModelBadge.Text = _bridge.DeviceModel;
-            TxtHardwareStatus.Text = _isSimulated 
-                ? "Simülasyon Modu" 
-                : "WMI ACPI • Aktif";
-            
-            if (_isSimulated)
-            {
-                DotStatus.Fill = new SolidColorBrush(Color.FromRgb(245, 158, 11)); // Amber
-            }
 
             SliderBrightness.Value = _brightness;
-            TxtBrightnessValue.Text = $"{_brightness}/4";
-            UpdateColorPreview();
+            UpdateBrightnessUI();
 
             ChkAutoStart.IsChecked = IsStartupEnabled();
 
@@ -231,13 +226,7 @@ namespace EHelper
 
             if (TxtPowerModeTitle != null)
             {
-                TxtPowerModeTitle.Text = _currentPowerMode switch
-                {
-                    ExcaliburPowerMode.Office => "Performans Modu: Sessiz",
-                    ExcaliburPowerMode.Gaming => "Performans Modu: Dengeli",
-                    ExcaliburPowerMode.HighPerformance => "Performans Modu: Turbo",
-                    _ => "Performans Modu"
-                };
+                TxtPowerModeTitle.Text = LocalizationManager.GetPowerModeTitle(_currentPowerMode);
             }
         }
 
@@ -294,11 +283,27 @@ namespace EHelper
             }
         }
 
+        private void UpdateBrightnessUI()
+        {
+            string symbol = _brightness switch
+            {
+                0 => "🌑",
+                1 => "🔅",
+                2 => "🔆",
+                3 => "🔆",
+                4 => "☀️",
+                _ => "🔆"
+            };
+
+            if (TxtBrightnessIcon != null) TxtBrightnessIcon.Text = symbol;
+            if (TxtBrightnessSliderIcon != null) TxtBrightnessSliderIcon.Text = symbol;
+        }
+
         private void SliderBrightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (!_isInitialized || TxtBrightnessValue == null || SliderBrightness == null) return;
+            if (!_isInitialized || SliderBrightness == null) return;
             _brightness = (byte)SliderBrightness.Value;
-            TxtBrightnessValue.Text = $"{_brightness}/4";
+            UpdateBrightnessUI();
 
             ApplyLedSettings();
         }
@@ -371,11 +376,7 @@ namespace EHelper
 
         private void UpdateColorPreview()
         {
-            var brush = new SolidColorBrush(Color.FromRgb(_red, _green, _blue));
-            if (BrdCurrentColor != null)
-            {
-                BrdCurrentColor.Background = brush;
-            }
+            // Color preview in slider bar removed as requested
         }
 
         private void ApplyLedSettings()
@@ -426,7 +427,7 @@ namespace EHelper
                 Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(204, 204, 204));// #CCCCCC
                 Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(142, 142, 147));    // #8E8E93
                 Resources["ProgressTrack"] = new SolidColorBrush(Color.FromRgb(42, 42, 42));   // #2A2A2A
-                if (BtnThemeToggle != null) BtnThemeToggle.Content = "☀️ Açık";
+                if (BtnThemeToggle != null) BtnThemeToggle.Content = LocalizationManager.ThemeLight;
             }
             else
             {
@@ -441,7 +442,7 @@ namespace EHelper
                 Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(60, 60, 67));   // #3C3C43
                 Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(142, 142, 147));    // #8E8E93
                 Resources["ProgressTrack"] = new SolidColorBrush(Color.FromRgb(229, 229, 234));
-                if (BtnThemeToggle != null) BtnThemeToggle.Content = "🌙 Koyu";
+                if (BtnThemeToggle != null) BtnThemeToggle.Content = LocalizationManager.ThemeDark;
             }
         }
 
@@ -505,6 +506,66 @@ namespace EHelper
             {
                 Debug.WriteLine($"[Startup] Failed to configure registry: {ex.Message}");
             }
+        }
+
+        private void ApplyLocalization()
+        {
+            if (TxtModeOfficeLabel != null) TxtModeOfficeLabel.Text = LocalizationManager.PowerOffice;
+            if (TxtModeGamingLabel != null) TxtModeGamingLabel.Text = LocalizationManager.PowerGaming;
+            if (TxtModeHighPerfLabel != null) TxtModeHighPerfLabel.Text = LocalizationManager.PowerTurbo;
+
+            if (TxtGpuHeader != null) TxtGpuHeader.Text = LocalizationManager.GpuHeader;
+            if (TxtSysResourcesHeader != null) TxtSysResourcesHeader.Text = LocalizationManager.SystemResourcesHeader;
+            if (TxtRamHeader != null) TxtRamHeader.Text = LocalizationManager.RamLabel;
+            if (TxtSsdHeader != null) TxtSsdHeader.Text = LocalizationManager.SsdLabel;
+
+            if (TxtKeyboardHeader != null) TxtKeyboardHeader.Text = LocalizationManager.KeyboardHeader;
+            if (LblBrightnessHeader != null) LblBrightnessHeader.Text = LocalizationManager.BrightnessLabel;
+            if (LblBrightnessTitle != null) LblBrightnessTitle.Text = LocalizationManager.BrightnessSliderTitle;
+
+            if (BtnLedStatic != null) BtnLedStatic.Content = LocalizationManager.LedStatic;
+            if (BtnLedBreathing != null) BtnLedBreathing.Content = LocalizationManager.LedBreathing;
+            if (BtnLedDynamic != null) BtnLedDynamic.Content = LocalizationManager.LedDynamic;
+            if (BtnLedOff != null) BtnLedOff.Content = LocalizationManager.LedOff;
+
+            if (TxtSpectrumTitle != null) TxtSpectrumTitle.Text = LocalizationManager.SpectrumTitle;
+            if (TxtPresetsTitle != null) TxtPresetsTitle.Text = LocalizationManager.PresetsTitle;
+
+            if (ChkAutoStart != null) ChkAutoStart.Content = LocalizationManager.AutoStart;
+            if (BtnCheckUpdates != null) BtnCheckUpdates.Content = LocalizationManager.CheckUpdates;
+
+            if (BtnRefreshTelemetry != null) BtnRefreshTelemetry.Content = LocalizationManager.Refresh;
+            if (BtnExitApp != null) BtnExitApp.Content = LocalizationManager.Exit;
+            if (BtnLangToggle != null) BtnLangToggle.Content = LocalizationManager.LangButton;
+
+            if (BtnThemeToggle != null)
+            {
+                BtnThemeToggle.Content = _isDarkTheme ? LocalizationManager.ThemeLight : LocalizationManager.ThemeDark;
+            }
+        }
+
+        private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
+        {
+            if (BtnCheckUpdates != null) BtnCheckUpdates.IsEnabled = false;
+            try
+            {
+                await UpdateService.CheckForUpdatesAsync(LocalizationManager.IsTurkish == false, this);
+            }
+            finally
+            {
+                if (BtnCheckUpdates != null) BtnCheckUpdates.IsEnabled = true;
+            }
+        }
+
+        private void BtnLangToggle_Click(object sender, RoutedEventArgs e)
+        {
+            string nextLang = LocalizationManager.IsTurkish ? "EN" : "TR";
+            LocalizationManager.CurrentLanguage = nextLang;
+            _config.CurrentSettings.Language = nextLang;
+            _config.SaveSettings();
+
+            ApplyLocalization();
+            UpdatePowerModeButtonsUI();
         }
 
         private void BtnExitApp_Click(object sender, RoutedEventArgs e)

@@ -49,46 +49,23 @@ namespace EHelper.UI
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
                 g.Clear(Color.Transparent);
 
-                // Dark rounded shield background
-                using var bgBrush = new LinearGradientBrush(
-                    new Point(0, 0),
-                    new Point(size, size),
-                    Color.FromArgb(255, 15, 23, 42),   // Slate 900
-                    Color.FromArgb(255, 30, 41, 59)    // Slate 800
-                );
+                // Blue circle
+                using var brush = new SolidBrush(Color.FromArgb(255, 108, 180, 238));
+                g.FillEllipse(brush, 2, 2, size - 4, size - 4);
 
-                using var path = new GraphicsPath();
-                int r = 14;
-                path.AddArc(2, 2, r * 2, r * 2, 180, 90);
-                path.AddArc(size - 2 - r * 2, 2, r * 2, r * 2, 270, 90);
-                path.AddArc(size - 2 - r * 2, size - 2 - r * 2, r * 2, r * 2, 0, 90);
-                path.AddArc(2, size - 2 - r * 2, r * 2, r * 2, 90, 90);
-                path.CloseFigure();
-
-                g.FillPath(bgBrush, path);
-
-                // Vibrant Cyan-Blue glowing border
-                using var borderPen = new Pen(Color.FromArgb(255, 14, 165, 233), 2.5f); // Sky 500
-                g.DrawPath(borderPen, path);
-
-                // Stylized 'e' monogram
-                using var textBrush = new LinearGradientBrush(
-                    new Point(10, 10),
-                    new Point(50, 50),
-                    Color.FromArgb(255, 56, 189, 248),  // Sky 400
-                    Color.FromArgb(255, 99, 102, 241)   // Indigo 500
-                );
-
-                using var font = new Font("Segoe UI", 32, FontStyle.Bold, GraphicsUnit.Pixel);
+                // White bold 'E'
+                using var textBrush = new SolidBrush(Color.White);
+                using var font = new Font("Segoe UI", 38, FontStyle.Bold, GraphicsUnit.Pixel);
                 using var format = new StringFormat
                 {
                     Alignment = StringAlignment.Center,
                     LineAlignment = StringAlignment.Center
                 };
 
-                g.DrawString("e", font, textBrush, new RectangleF(0, -2, size, size), format);
+                g.DrawString("E", font, textBrush, new RectangleF(0, -3, size, size), format);
             }
 
             IntPtr hIcon = bmp.GetHicon();
