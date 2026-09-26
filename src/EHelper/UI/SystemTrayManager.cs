@@ -20,7 +20,7 @@ namespace EHelper.UI
             _notifyIcon = new NotifyIcon
             {
                 Icon = IconHelper.CreateAppIcon(),
-                Text = "E-Helper (Casper Excalibur)",
+                Text = "CPU: --°C Fan: --RPM\nGPU: --°C Fan: --RPM",
                 Visible = true
             };
 
@@ -73,7 +73,14 @@ namespace EHelper.UI
         {
             if (!_isDisposed && _notifyIcon != null)
             {
-                _notifyIcon.Text = text.Length > 63 ? text[..63] : text;
+                try
+                {
+                    _notifyIcon.Text = text.Length > 63 ? text[..63] : text;
+                }
+                catch
+                {
+                    // Ignore transient Win32 tray notification errors
+                }
             }
         }
 

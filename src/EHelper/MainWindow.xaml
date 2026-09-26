@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:EHelper"
         mc:Ignorable="d"
         Title="E-Helper"
+        Icon="Assets/app.ico"
         Height="670" 
         Width="420"
         WindowStyle="None"
@@ -149,8 +150,9 @@
             <!-- 0: Header (G-Helper Title & Close) -->
             <Grid Grid.Row="0" Margin="0,0,0,14">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="E-Helper — " FontSize="12" Foreground="{DynamicResource TextMuted}" FontWeight="Normal"/>
-                    <TextBlock x:Name="TxtModelBadge" Text="Casper Excalibur G870" FontSize="12" Foreground="{DynamicResource TextMuted}" FontWeight="SemiBold"/>
+                    <Image Source="Assets/logo.png" Width="18" Height="18" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center"/>
+                    <TextBlock Text="E-Helper — " FontSize="12" Foreground="{DynamicResource TextMuted}" FontWeight="Normal" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="TxtModelBadge" Text="Casper Excalibur G870" FontSize="12" Foreground="{DynamicResource TextMuted}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <Button x:Name="BtnCloseToTray" Content="✕" Width="22" Height="22" HorizontalAlignment="Right"

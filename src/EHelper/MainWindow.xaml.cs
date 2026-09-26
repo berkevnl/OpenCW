@@ -33,15 +33,18 @@ namespace EHelper
         private byte _blue;
         private bool _isDarkTheme;
 
+        private bool _isInitialized;
+
         public MainWindow(IHardwareBridge bridge, bool isSimulated, ConfigManager config, HardwareMonitorService monitor)
         {
+            _bridge = bridge ?? throw new ArgumentNullException(nameof(bridge));
+            _isSimulated = isSimulated;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+
             InitializeComponent();
 
-            _bridge = bridge;
-            _isSimulated = isSimulated;
-            _config = config;
-            _monitor = monitor;
-
+            _isInitialized = true;
             ApplyInitialState();
             SubscribeTelemetry();
         }
@@ -216,20 +219,26 @@ namespace EHelper
 
         private void UpdatePowerModeButtonsUI()
         {
-            var normalStyle = (Style)FindResource("GHelperTileStyle");
-            var activeStyle = (Style)FindResource("ActiveGHelperTileStyle");
+            var normalStyle = TryFindResource("GHelperTileStyle") as Style;
+            var activeStyle = TryFindResource("ActiveGHelperTileStyle") as Style;
 
-            BtnModeOffice.Style = _currentPowerMode == ExcaliburPowerMode.Office ? activeStyle : normalStyle;
-            BtnModeGaming.Style = _currentPowerMode == ExcaliburPowerMode.Gaming ? activeStyle : normalStyle;
-            BtnModeHighPerf.Style = _currentPowerMode == ExcaliburPowerMode.HighPerformance ? activeStyle : normalStyle;
-
-            TxtPowerModeTitle.Text = _currentPowerMode switch
+            if (BtnModeOffice != null && normalStyle != null && activeStyle != null)
             {
-                ExcaliburPowerMode.Office => "Performans Modu: Sessiz",
-                ExcaliburPowerMode.Gaming => "Performans Modu: Dengeli",
-                ExcaliburPowerMode.HighPerformance => "Performans Modu: Turbo",
-                _ => "Performans Modu"
-            };
+                BtnModeOffice.Style = _currentPowerMode == ExcaliburPowerMode.Office ? activeStyle : normalStyle;
+                BtnModeGaming.Style = _currentPowerMode == ExcaliburPowerMode.Gaming ? activeStyle : normalStyle;
+                BtnModeHighPerf.Style = _currentPowerMode == ExcaliburPowerMode.HighPerformance ? activeStyle : normalStyle;
+            }
+
+            if (TxtPowerModeTitle != null)
+            {
+                TxtPowerModeTitle.Text = _currentPowerMode switch
+                {
+                    ExcaliburPowerMode.Office => "Performans Modu: Sessiz",
+                    ExcaliburPowerMode.Gaming => "Performans Modu: Dengeli",
+                    ExcaliburPowerMode.HighPerformance => "Performans Modu: Turbo",
+                    _ => "Performans Modu"
+                };
+            }
         }
 
         #endregion
@@ -266,22 +275,28 @@ namespace EHelper
 
         private void UpdateLedModeButtonsUI()
         {
-            var normalStyle = (Style)FindResource("GHelperTileStyle");
-            var activeStyle = (Style)FindResource("ActiveGHelperTileStyle");
+            var normalStyle = TryFindResource("GHelperTileStyle") as Style;
+            var activeStyle = TryFindResource("ActiveGHelperTileStyle") as Style;
 
-            BtnLedStatic.Style = _currentLedMode == ExcaliburLedMode.Static ? activeStyle : normalStyle;
-            BtnLedBreathing.Style = _currentLedMode == ExcaliburLedMode.Breathing ? activeStyle : normalStyle;
-            BtnLedDynamic.Style = (_currentLedMode == ExcaliburLedMode.ColorfulCycle || _currentLedMode == ExcaliburLedMode.Rainbow) ? activeStyle : normalStyle;
-            BtnLedOff.Style = _currentLedMode == ExcaliburLedMode.Off ? activeStyle : normalStyle;
+            if (BtnLedStatic != null && normalStyle != null && activeStyle != null)
+            {
+                BtnLedStatic.Style = _currentLedMode == ExcaliburLedMode.Static ? activeStyle : normalStyle;
+                BtnLedBreathing.Style = _currentLedMode == ExcaliburLedMode.Breathing ? activeStyle : normalStyle;
+                BtnLedDynamic.Style = (_currentLedMode == ExcaliburLedMode.ColorfulCycle || _currentLedMode == ExcaliburLedMode.Rainbow) ? activeStyle : normalStyle;
+                BtnLedOff.Style = _currentLedMode == ExcaliburLedMode.Off ? activeStyle : normalStyle;
+            }
 
             // Palette and preset colors only apply to Static and Breathing modes
-            bool isManualColor = _currentLedMode == ExcaliburLedMode.Static || _currentLedMode == ExcaliburLedMode.Breathing;
-            PnlColorSection.Visibility = isManualColor ? Visibility.Visible : Visibility.Collapsed;
+            if (PnlColorSection != null)
+            {
+                bool isManualColor = _currentLedMode == ExcaliburLedMode.Static || _currentLedMode == ExcaliburLedMode.Breathing;
+                PnlColorSection.Visibility = isManualColor ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
         private void SliderBrightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (TxtBrightnessValue == null) return;
+            if (!_isInitialized || TxtBrightnessValue == null || SliderBrightness == null) return;
             _brightness = (byte)SliderBrightness.Value;
             TxtBrightnessValue.Text = $"{_brightness}/4";
 
@@ -365,6 +380,8 @@ namespace EHelper
 
         private void ApplyLedSettings()
         {
+            if (!_isInitialized || _bridge == null || _config == null) return;
+
             if (_currentLedMode == ExcaliburLedMode.Off)
             {
                 _bridge.TurnOffAllLights();
@@ -409,7 +426,7 @@ namespace EHelper
                 Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(204, 204, 204));// #CCCCCC
                 Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(142, 142, 147));    // #8E8E93
                 Resources["ProgressTrack"] = new SolidColorBrush(Color.FromRgb(42, 42, 42));   // #2A2A2A
-                BtnThemeToggle.Content = "☀️ Açık";
+                if (BtnThemeToggle != null) BtnThemeToggle.Content = "☀️ Açık";
             }
             else
             {
@@ -424,7 +441,7 @@ namespace EHelper
                 Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(60, 60, 67));   // #3C3C43
                 Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(142, 142, 147));    // #8E8E93
                 Resources["ProgressTrack"] = new SolidColorBrush(Color.FromRgb(229, 229, 234));
-                BtnThemeToggle.Content = "🌙 Koyu";
+                if (BtnThemeToggle != null) BtnThemeToggle.Content = "🌙 Koyu";
             }
         }
 
@@ -441,6 +458,7 @@ namespace EHelper
 
         private void ChkAutoStart_Changed(object sender, RoutedEventArgs e)
         {
+            if (!_isInitialized || ChkAutoStart == null || _config == null) return;
             bool enable = ChkAutoStart.IsChecked == true;
             SetStartup(enable);
             _config.CurrentSettings.StartWithWindows = enable;
