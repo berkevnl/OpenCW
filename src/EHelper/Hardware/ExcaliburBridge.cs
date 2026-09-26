@@ -12,7 +12,6 @@ namespace EHelper.Hardware
         
         private readonly object _syncLock = new();
         private ManagementObject? _wmiInstance;
-        private ManagementClass? _wmiClass;
         private bool _isDisposed;
 
         public bool IsHardwareConnected { get; private set; }
@@ -33,18 +32,15 @@ namespace EHelper.Hardware
                 var scope = new ManagementScope(WmiNamespace);
                 scope.Connect();
 
-                // 1. Initialize class
-                _wmiClass = new ManagementClass(scope, new ManagementPath(WmiClassName), null);
-
-                // 2. Find active instance of RW_GMWMI
-                using var instances = _wmiClass.GetInstances();
-                foreach (ManagementObject inst in instances)
+                using var searcher = new ManagementObjectSearcher(scope, new ObjectQuery($"SELECT * FROM {WmiClassName}"));
+                foreach (ManagementObject inst in searcher.Get())
                 {
                     _wmiInstance = inst;
                     break;
                 }
 
-                IsHardwareConnected = (_wmiInstance != null || _wmiClass != null);
+                IsHardwareConnected = (_wmiInstance != null);
+                Debug.WriteLine($"[ExcaliburBridge] WMI connection established: {IsHardwareConnected}");
             }
             catch (Exception ex)
             {
@@ -55,7 +51,7 @@ namespace EHelper.Hardware
 
         private bool PerformSmi(ref SMI_STRUCT_S smi)
         {
-            if (!IsHardwareConnected && _wmiInstance == null && _wmiClass == null)
+            if (_wmiInstance == null)
             {
                 return false;
             }
@@ -71,34 +67,35 @@ namespace EHelper.Hardware
                     Marshal.StructureToPtr(smi, ptr, false);
                     Marshal.Copy(ptr, inBuffer, 0, size);
 
+                    // 1. Write inBuffer to WMI ACPI SMI
+                    _wmiInstance["BufferBytes"] = inBuffer;
+                    _wmiInstance.Put(); // Executes SMI interrupt on Quanta EC
+
+                    // 2. Fetch fresh output buffer from ACPI WMI
                     byte[]? outBuffer = null;
 
-                    // Option A: Write and read directly on ManagementClass (matching original ControlCenter decompilation)
-                    if (_wmiClass != null)
+                    try
                     {
-                        try
+                        using var searcher = new ManagementObjectSearcher(WmiNamespace, "SELECT BufferBytes FROM RW_GMWMI");
+                        foreach (ManagementObject obj in searcher.Get())
                         {
-                            _wmiClass["BufferBytes"] = inBuffer;
-                            outBuffer = _wmiClass["BufferBytes"] as byte[];
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"[ExcaliburBridge] _wmiClass SMI write/read failed: {ex.Message}");
+                            if (obj["BufferBytes"] is byte[] fresh && fresh.Length >= size)
+                            {
+                                outBuffer = fresh;
+                                break;
+                            }
                         }
                     }
+                    catch { }
 
-                    // Option B: Fallback to active instance without calling Put() (dynamic ACPI providers do not support Put)
-                    if ((outBuffer == null || outBuffer.Length < size) && _wmiInstance != null)
+                    if (outBuffer == null || outBuffer.Length < size)
                     {
                         try
                         {
-                            _wmiInstance.SetPropertyValue("BufferBytes", inBuffer);
-                            outBuffer = _wmiInstance.GetPropertyValue("BufferBytes") as byte[];
+                            _wmiInstance.Get();
+                            outBuffer = _wmiInstance["BufferBytes"] as byte[];
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"[ExcaliburBridge] _wmiInstance SMI write/read failed: {ex.Message}");
-                        }
+                        catch { }
                     }
 
                     if (outBuffer != null && outBuffer.Length >= size)
@@ -112,7 +109,7 @@ namespace EHelper.Hardware
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[ExcaliburBridge] SMI Execution failed: {ex.Message}");
+                    Debug.WriteLine($"[ExcaliburBridge] SMI Execution error: {ex.Message}");
                     return false;
                 }
                 finally
@@ -126,28 +123,43 @@ namespace EHelper.Hardware
         {
             var smi = new SMI_STRUCT_S();
             smi.Clear();
-            smi.a0 = 0xFA00; // Read
-            smi.a1 = 0x0200; // CPU & GPU
+            smi.a0 = 0xFA00; // Read Mode
+            smi.a1 = 0x0200; // CPU & GPU Telemetry Subcode
 
-            bool success = PerformSmi(ref smi);
-            byte cpuTemp = success ? (byte)smi.a2 : (byte)0;
-            byte gpuTemp = success ? (byte)smi.a3 : (byte)0;
-            ushort cpuRpm = success ? (ushort)smi.a4 : (ushort)0;
-            ushort gpuRpm = success ? (ushort)smi.a5 : (ushort)0;
+            bool smiSuccess = PerformSmi(ref smi);
 
-            // Fallback for CPU temperature if WMI SMI returned 0
+            byte cpuTemp = 0;
+            byte gpuTemp = 0;
+            ushort cpuRpm = 0;
+            ushort gpuRpm = 0;
+
+            if (smiSuccess)
+            {
+                cpuTemp = (byte)(smi.a2 & 0xFF);
+                gpuTemp = (byte)(smi.a3 & 0xFF);
+                cpuRpm = (ushort)(smi.a4 & 0xFFFF);
+                gpuRpm = (ushort)(smi.a5 & 0xFFFF);
+            }
+
+            // Fallback for CPU temperature if 0
             if (cpuTemp == 0)
             {
                 cpuTemp = GetThermalZoneTemperature();
             }
 
-            // Fallback for GPU temperature if dedicated NVIDIA GPU is present and SMI returned 0
+            // Fallback for GPU temperature & fan if 0
             if (gpuTemp == 0)
             {
-                gpuTemp = (byte)NvmlHelper.GetGpuTemperature();
+                var nvGpu = NvmlHelper.GetGpuMetrics();
+                gpuTemp = (byte)nvGpu.Temp;
+                if (gpuRpm == 0 && nvGpu.FanPercent > 0)
+                {
+                    // Estimate RPM from percentage if tachometer is 0
+                    gpuRpm = (ushort)(nvGpu.FanPercent * 45); 
+                }
             }
 
-            if (success || cpuTemp > 0 || gpuTemp > 0)
+            if (smiSuccess || cpuTemp > 0 || gpuTemp > 0 || cpuRpm > 0 || gpuRpm > 0)
             {
                 return new HardwareTelemetry(
                     CpuTemperature: cpuTemp,
@@ -172,7 +184,6 @@ namespace EHelper.Hardware
                 {
                     if (obj["CurrentTemperature"] is uint k && k > 2732)
                     {
-                        // In tenths of Kelvin: (k - 2732) / 10
                         int c = (int)((k - 2732) / 10);
                         if (c is > 10 and < 115) return (byte)c;
                     }
@@ -186,8 +197,8 @@ namespace EHelper.Hardware
         {
             var smi = new SMI_STRUCT_S();
             smi.Clear();
-            smi.a0 = 0xFB00; // Write
-            smi.a1 = 0x0300; // Power Mode
+            smi.a0 = 0xFB00; // Write Mode
+            smi.a1 = 0x0300; // Power Mode Subcode
             smi.a2 = (uint)mode;
             return PerformSmi(ref smi);
         }
@@ -207,7 +218,7 @@ namespace EHelper.Hardware
             var smi = new SMI_STRUCT_S();
             smi.Clear();
             smi.a0 = 0xFB00;
-            smi.a1 = 0x0205; // Fan Speed Percentage
+            smi.a1 = 0x0205; // Fan Speed
             smi.a2 = cpuPercent;
             smi.a3 = gpuPercent;
             smi.a4 = sysPercent;
@@ -234,7 +245,7 @@ namespace EHelper.Hardware
             var smi = new SMI_STRUCT_S();
             smi.Clear();
             smi.a0 = 0xFB00;
-            smi.a1 = 0x0100; // LED Control
+            smi.a1 = 0x0100; // LED Control Subcode
             smi.a2 = (uint)zone;
             smi.a3 = packed;
             return PerformSmi(ref smi);
@@ -242,7 +253,10 @@ namespace EHelper.Hardware
 
         public bool SetAllKeyboardLed(ExcaliburLedMode mode, byte brightness, byte r, byte g, byte b)
         {
-            return SetLed(ExcaliburLedZone.AllKeyboard, mode, brightness, r, g, b);
+            // Set both Zone 6 (ALLKBLED) and Zone 0 (All) for comprehensive coverage
+            bool res1 = SetLed(ExcaliburLedZone.AllKeyboard, mode, brightness, r, g, b);
+            bool res2 = SetLed(ExcaliburLedZone.All, mode, brightness, r, g, b);
+            return res1 || res2;
         }
 
         public bool TurnOffAllLights()
@@ -258,7 +272,6 @@ namespace EHelper.Hardware
             try
             {
                 _wmiInstance?.Dispose();
-                _wmiClass?.Dispose();
             }
             catch
             {
@@ -266,7 +279,6 @@ namespace EHelper.Hardware
             }
         }
 
-        // Lightweight NVIDIA NVML Helper for fallback GPU temperature
         private static class NvmlHelper
         {
             [DllImport("nvml.dll", EntryPoint = "nvmlInit_v2")]
@@ -278,13 +290,16 @@ namespace EHelper.Hardware
             [DllImport("nvml.dll", EntryPoint = "nvmlDeviceGetTemperature")]
             private static extern int nvmlDeviceGetTemperature(IntPtr device, int sensorType, out uint temp);
 
+            [DllImport("nvml.dll", EntryPoint = "nvmlDeviceGetFanSpeed")]
+            private static extern int nvmlDeviceGetFanSpeed(IntPtr device, out uint fanSpeed);
+
             private static bool _initialized;
             private static IntPtr _deviceHandle = IntPtr.Zero;
             private static bool _nvmlUnavailable;
 
-            public static uint GetGpuTemperature()
+            public static (uint Temp, uint FanPercent) GetGpuMetrics()
             {
-                if (_nvmlUnavailable) return 0;
+                if (_nvmlUnavailable) return (0, 0);
 
                 try
                 {
@@ -297,23 +312,29 @@ namespace EHelper.Hardware
                         else
                         {
                             _nvmlUnavailable = true;
-                            return 0;
+                            return (0, 0);
                         }
                     }
 
                     if (_initialized && _deviceHandle != IntPtr.Zero)
                     {
-                        if (nvmlDeviceGetTemperature(_deviceHandle, 0, out uint temp) == 0)
-                        {
-                            return temp;
-                        }
+                        uint temp = 0;
+                        uint fan = 0;
+
+                        if (nvmlDeviceGetTemperature(_deviceHandle, 0, out uint t) == 0)
+                            temp = t;
+
+                        if (nvmlDeviceGetFanSpeed(_deviceHandle, out uint f) == 0)
+                            fan = f;
+
+                        return (temp, fan);
                     }
                 }
                 catch
                 {
                     _nvmlUnavailable = true;
                 }
-                return 0;
+                return (0, 0);
             }
         }
     }

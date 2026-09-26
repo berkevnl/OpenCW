@@ -31,6 +31,7 @@ namespace EHelper
         private byte _red;
         private byte _green;
         private byte _blue;
+        private bool _isDarkTheme;
 
         public MainWindow(IHardwareBridge bridge, bool isSimulated, ConfigManager config, HardwareMonitorService monitor)
         {
@@ -54,6 +55,10 @@ namespace EHelper
             _red = s.Red;
             _green = s.Green;
             _blue = s.Blue;
+            _isDarkTheme = s.IsDarkTheme;
+
+            // Apply Theme
+            ApplyTheme(_isDarkTheme);
 
             // UI Initial Values
             TxtModelBadge.Text = _bridge.DeviceModel;
@@ -79,13 +84,25 @@ namespace EHelper
             _bridge.SetPowerMode(_currentPowerMode);
             PowerPlanManager.ApplyPowerPlan(_currentPowerMode);
             ApplyLedSettings();
+
+            // Initial System Metrics query
+            UpdateSystemResourcesUI();
         }
 
         private void SubscribeTelemetry()
         {
             _monitor.TelemetryUpdated += telemetry =>
             {
-                Dispatcher.InvokeAsync(() => UpdateTelemetryUI(telemetry));
+                Dispatcher.InvokeAsync(() =>
+                {
+                    UpdateTelemetryUI(telemetry);
+
+                    // Only refresh RAM/SSD metrics when the user is actively viewing the panel
+                    if (IsVisible)
+                    {
+                        UpdateSystemResourcesUI();
+                    }
+                });
             };
         }
 
@@ -124,6 +141,23 @@ namespace EHelper
             TxtGpuRpm.Text = $"{t.GpuFanRpm} RPM";
         }
 
+        private void UpdateSystemResourcesUI()
+        {
+            try
+            {
+                var metrics = SystemResourceMonitor.GetMetrics();
+
+                TxtRamPercent.Text = $"{metrics.RamPercent}%";
+                TxtRamUsage.Text = $"{metrics.RamUsedGb:F1} / {metrics.RamTotalGb:F1} GB";
+                PbRamUsage.Value = metrics.RamPercent;
+
+                TxtSsdPercent.Text = $"{metrics.SsdPercent}%";
+                TxtSsdUsage.Text = $"{metrics.SsdUsedGb:F0} / {metrics.SsdTotalGb:F0} GB";
+                PbSsdUsage.Value = metrics.SsdPercent;
+            }
+            catch { }
+        }
+
         #region Flyout & Auto-Hide & Memory Trim
 
         public void PositionBottomRight()
@@ -143,6 +177,7 @@ namespace EHelper
             else
             {
                 PositionBottomRight();
+                UpdateSystemResourcesUI();
                 Show();
                 Activate();
                 Focus();
@@ -152,9 +187,7 @@ namespace EHelper
         protected override void OnDeactivated(EventArgs e)
         {
             base.OnDeactivated(e);
-            // Hide automatically when user clicks anywhere outside the flyout
             Hide();
-            // Drop RAM working set immediately back to G-Helper levels (~2-5 MB)
             MemoryOptimizer.TrimMemory();
         }
 
@@ -219,14 +252,10 @@ namespace EHelper
             SetLedMode(ExcaliburLedMode.Breathing);
         }
 
-        private void BtnLedCycle_Click(object sender, RoutedEventArgs e)
+        private void BtnLedDynamic_Click(object sender, RoutedEventArgs e)
         {
+            // Orijinal Excalibur Dinamik Işık modu (Mode 6 - Colorful Dynamic Cycle)
             SetLedMode(ExcaliburLedMode.ColorfulCycle);
-        }
-
-        private void BtnLedRainbow_Click(object sender, RoutedEventArgs e)
-        {
-            SetLedMode(ExcaliburLedMode.Rainbow);
         }
 
         private void BtnLedOff_Click(object sender, RoutedEventArgs e)
@@ -248,16 +277,12 @@ namespace EHelper
 
             BtnLedStatic.Style = _currentLedMode == ExcaliburLedMode.Static ? activeStyle : normalStyle;
             BtnLedBreathing.Style = _currentLedMode == ExcaliburLedMode.Breathing ? activeStyle : normalStyle;
-            BtnLedCycle.Style = _currentLedMode == ExcaliburLedMode.ColorfulCycle ? activeStyle : normalStyle;
-            BtnLedRainbow.Style = _currentLedMode == ExcaliburLedMode.Rainbow ? activeStyle : normalStyle;
+            BtnLedDynamic.Style = (_currentLedMode == ExcaliburLedMode.ColorfulCycle || _currentLedMode == ExcaliburLedMode.Rainbow) ? activeStyle : normalStyle;
             BtnLedOff.Style = _currentLedMode == ExcaliburLedMode.Off ? activeStyle : normalStyle;
 
             // Palette and preset colors only apply to Static and Breathing modes
             bool isManualColor = _currentLedMode == ExcaliburLedMode.Static || _currentLedMode == ExcaliburLedMode.Breathing;
-            bool isDynamic = _currentLedMode == ExcaliburLedMode.ColorfulCycle || _currentLedMode == ExcaliburLedMode.Rainbow;
-
             PnlColorSection.Visibility = isManualColor ? Visibility.Visible : Visibility.Collapsed;
-            BrdDynamicModeNotice.Visibility = isDynamic ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void SliderBrightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -303,7 +328,7 @@ namespace EHelper
             if (h < 60) { r = c; g = x; b = 0; }
             else if (h < 120) { r = x; g = c; b = 0; }
             else if (h < 180) { r = 0; g = c; b = x; }
-            else if (h < 240) { r = 0; g = x; b = c; }
+            else if (h < 240) { r = 0; g = x; b = 0; }
             else if (h < 300) { r = x; g = 0; b = c; }
             else { r = c; g = 0; b = x; }
 
@@ -362,6 +387,44 @@ namespace EHelper
             _config.CurrentSettings.Green = _green;
             _config.CurrentSettings.Blue = _blue;
             _config.SaveSettings();
+        }
+
+        #endregion
+
+        #region Theme Switcher (Dark / Light)
+
+        private void BtnThemeToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _isDarkTheme = !_isDarkTheme;
+            ApplyTheme(_isDarkTheme);
+            _config.CurrentSettings.IsDarkTheme = _isDarkTheme;
+            _config.SaveSettings();
+        }
+
+        private void ApplyTheme(bool isDark)
+        {
+            if (isDark)
+            {
+                Resources["BgBrush"] = new SolidColorBrush(Color.FromRgb(11, 15, 25));       // #0B0F19
+                Resources["CardBgBrush"] = new SolidColorBrush(Color.FromRgb(21, 29, 46));   // #151D2E
+                Resources["CardHoverBrush"] = new SolidColorBrush(Color.FromRgb(28, 39, 60));// #1C273C
+                Resources["BorderBrush"] = new SolidColorBrush(Color.FromRgb(34, 48, 74));   // #22304A
+                Resources["TextPrimary"] = new SolidColorBrush(Color.FromRgb(248, 250, 252)); // #F8FAFC
+                Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(148, 163, 184)); // #94A3B8
+                Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(100, 116, 139)); // #64748B
+                BtnThemeToggle.Content = "☀️ Açık";
+            }
+            else
+            {
+                Resources["BgBrush"] = new SolidColorBrush(Color.FromRgb(248, 250, 252));     // #F8FAFC
+                Resources["CardBgBrush"] = new SolidColorBrush(Color.FromRgb(255, 255, 255)); // #FFFFFF
+                Resources["CardHoverBrush"] = new SolidColorBrush(Color.FromRgb(241, 245, 249));// #F1F5F9
+                Resources["BorderBrush"] = new SolidColorBrush(Color.FromRgb(226, 232, 240)); // #E2E8F0
+                Resources["TextPrimary"] = new SolidColorBrush(Color.FromRgb(15, 23, 42));    // #0F172A
+                Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(71, 85, 105)); // #475569
+                Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(148, 163, 184));   // #94A3B8
+                BtnThemeToggle.Content = "🌙 Koyu";
+            }
         }
 
         #endregion
