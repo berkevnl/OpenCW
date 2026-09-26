@@ -63,16 +63,16 @@ namespace EHelper
             // UI Initial Values
             TxtModelBadge.Text = _bridge.DeviceModel;
             TxtHardwareStatus.Text = _isSimulated 
-                ? "Simülasyon Modu (Mock ACPI)" 
-                : "WMI ACPI SMI • Bağlı";
+                ? "Simülasyon Modu" 
+                : "WMI ACPI • Aktif";
             
             if (_isSimulated)
             {
-                DotStatus.Fill = (SolidColorBrush)FindResource("WarningOrange");
+                DotStatus.Fill = new SolidColorBrush(Color.FromRgb(245, 158, 11)); // Amber
             }
 
             SliderBrightness.Value = _brightness;
-            TxtBrightnessValue.Text = _brightness.ToString();
+            TxtBrightnessValue.Text = $"{_brightness}/4";
             UpdateColorPreview();
 
             ChkAutoStart.IsChecked = IsStartupEnabled();
@@ -110,35 +110,21 @@ namespace EHelper
         {
             if (!t.IsAvailable)
             {
-                TxtCpuTemp.Text = "-- °C";
-                TxtGpuTemp.Text = "-- °C";
-                TxtCpuRpm.Text = "0 RPM";
-                TxtGpuRpm.Text = "0 RPM";
+                TxtCpuTemp.Text = "--°C";
+                TxtGpuTemp.Text = "--°C";
+                TxtCpuRpm.Text = "--RPM";
+                TxtGpuRpm.Text = "--RPM";
                 return;
             }
 
-            TxtCpuTemp.Text = $"{t.CpuTemperature} °C";
+            TxtCpuTemp.Text = $"{t.CpuTemperature}°C";
             PbCpuTemp.Value = Math.Min(100, (double)t.CpuTemperature);
 
-            if (t.CpuTemperature > 82)
-                TxtCpuTemp.Foreground = (SolidColorBrush)FindResource("DangerRed");
-            else if (t.CpuTemperature > 68)
-                TxtCpuTemp.Foreground = (SolidColorBrush)FindResource("WarningOrange");
-            else
-                TxtCpuTemp.Foreground = (SolidColorBrush)FindResource("AccentCyan");
-
-            TxtGpuTemp.Text = $"{t.GpuTemperature} °C";
+            TxtGpuTemp.Text = $"{t.GpuTemperature}°C";
             PbGpuTemp.Value = Math.Min(100, (double)t.GpuTemperature);
 
-            if (t.GpuTemperature > 80)
-                TxtGpuTemp.Foreground = (SolidColorBrush)FindResource("DangerRed");
-            else if (t.GpuTemperature > 65)
-                TxtGpuTemp.Foreground = (SolidColorBrush)FindResource("WarningOrange");
-            else
-                TxtGpuTemp.Foreground = (SolidColorBrush)FindResource("AccentPurple");
-
-            TxtCpuRpm.Text = $"{t.CpuFanRpm} RPM";
-            TxtGpuRpm.Text = $"{t.GpuFanRpm} RPM";
+            TxtCpuRpm.Text = $"{t.CpuFanRpm}RPM";
+            TxtGpuRpm.Text = $"{t.GpuFanRpm}RPM";
         }
 
         private void UpdateSystemResourcesUI()
@@ -230,12 +216,20 @@ namespace EHelper
 
         private void UpdatePowerModeButtonsUI()
         {
-            var normalStyle = (Style)FindResource("ModeButtonStyle");
-            var activeStyle = (Style)FindResource("ActiveModeButtonStyle");
+            var normalStyle = (Style)FindResource("GHelperTileStyle");
+            var activeStyle = (Style)FindResource("ActiveGHelperTileStyle");
 
             BtnModeOffice.Style = _currentPowerMode == ExcaliburPowerMode.Office ? activeStyle : normalStyle;
             BtnModeGaming.Style = _currentPowerMode == ExcaliburPowerMode.Gaming ? activeStyle : normalStyle;
             BtnModeHighPerf.Style = _currentPowerMode == ExcaliburPowerMode.HighPerformance ? activeStyle : normalStyle;
+
+            TxtPowerModeTitle.Text = _currentPowerMode switch
+            {
+                ExcaliburPowerMode.Office => "Performans Modu: Sessiz",
+                ExcaliburPowerMode.Gaming => "Performans Modu: Dengeli",
+                ExcaliburPowerMode.HighPerformance => "Performans Modu: Turbo",
+                _ => "Performans Modu"
+            };
         }
 
         #endregion
@@ -272,8 +266,8 @@ namespace EHelper
 
         private void UpdateLedModeButtonsUI()
         {
-            var normalStyle = (Style)FindResource("ModeButtonStyle");
-            var activeStyle = (Style)FindResource("ActiveModeButtonStyle");
+            var normalStyle = (Style)FindResource("GHelperTileStyle");
+            var activeStyle = (Style)FindResource("ActiveGHelperTileStyle");
 
             BtnLedStatic.Style = _currentLedMode == ExcaliburLedMode.Static ? activeStyle : normalStyle;
             BtnLedBreathing.Style = _currentLedMode == ExcaliburLedMode.Breathing ? activeStyle : normalStyle;
@@ -289,7 +283,7 @@ namespace EHelper
         {
             if (TxtBrightnessValue == null) return;
             _brightness = (byte)SliderBrightness.Value;
-            TxtBrightnessValue.Text = _brightness.ToString();
+            TxtBrightnessValue.Text = $"{_brightness}/4";
 
             ApplyLedSettings();
         }
@@ -363,10 +357,9 @@ namespace EHelper
         private void UpdateColorPreview()
         {
             var brush = new SolidColorBrush(Color.FromRgb(_red, _green, _blue));
-            BrdCurrentColor.Background = brush;
-            if (BrdActiveColorPreview != null)
+            if (BrdCurrentColor != null)
             {
-                BrdActiveColorPreview.Background = brush;
+                BrdCurrentColor.Background = brush;
             }
         }
 
@@ -391,7 +384,7 @@ namespace EHelper
 
         #endregion
 
-        #region Theme Switcher (Dark / Light)
+        #region Theme Switcher (G-Helper Dark / Clean Light)
 
         private void BtnThemeToggle_Click(object sender, RoutedEventArgs e)
         {
@@ -405,24 +398,32 @@ namespace EHelper
         {
             if (isDark)
             {
-                Resources["BgBrush"] = new SolidColorBrush(Color.FromRgb(11, 15, 25));       // #0B0F19
-                Resources["CardBgBrush"] = new SolidColorBrush(Color.FromRgb(21, 29, 46));   // #151D2E
-                Resources["CardHoverBrush"] = new SolidColorBrush(Color.FromRgb(28, 39, 60));// #1C273C
-                Resources["BorderBrush"] = new SolidColorBrush(Color.FromRgb(34, 48, 74));   // #22304A
-                Resources["TextPrimary"] = new SolidColorBrush(Color.FromRgb(248, 250, 252)); // #F8FAFC
-                Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(148, 163, 184)); // #94A3B8
-                Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(100, 116, 139)); // #64748B
+                // Authentic G-Helper Matte Dark
+                Resources["WindowBg"] = new SolidColorBrush(Color.FromRgb(22, 22, 22));        // #161616
+                Resources["TileBg"] = new SolidColorBrush(Color.FromRgb(37, 37, 37));          // #252525
+                Resources["TileHoverBg"] = new SolidColorBrush(Color.FromRgb(50, 50, 50));     // #323232
+                Resources["TileBorder"] = new SolidColorBrush(Color.FromRgb(56, 56, 56));      // #383838
+                Resources["TileActiveBg"] = new SolidColorBrush(Color.FromRgb(25, 39, 56));    // #192738
+                Resources["TileActiveBorder"] = new SolidColorBrush(Color.FromRgb(0, 144, 255)); // #0090FF
+                Resources["TextPrimary"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));  // #FFFFFF
+                Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(204, 204, 204));// #CCCCCC
+                Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(142, 142, 147));    // #8E8E93
+                Resources["ProgressTrack"] = new SolidColorBrush(Color.FromRgb(42, 42, 42));   // #2A2A2A
                 BtnThemeToggle.Content = "☀️ Açık";
             }
             else
             {
-                Resources["BgBrush"] = new SolidColorBrush(Color.FromRgb(248, 250, 252));     // #F8FAFC
-                Resources["CardBgBrush"] = new SolidColorBrush(Color.FromRgb(255, 255, 255)); // #FFFFFF
-                Resources["CardHoverBrush"] = new SolidColorBrush(Color.FromRgb(241, 245, 249));// #F1F5F9
-                Resources["BorderBrush"] = new SolidColorBrush(Color.FromRgb(226, 232, 240)); // #E2E8F0
-                Resources["TextPrimary"] = new SolidColorBrush(Color.FromRgb(15, 23, 42));    // #0F172A
-                Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(71, 85, 105)); // #475569
-                Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(148, 163, 184));   // #94A3B8
+                // Clean High-Contrast Light
+                Resources["WindowBg"] = new SolidColorBrush(Color.FromRgb(242, 242, 247));     // #F2F2F7
+                Resources["TileBg"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));       // #FFFFFF
+                Resources["TileHoverBg"] = new SolidColorBrush(Color.FromRgb(235, 235, 240));  // #EBEBF0
+                Resources["TileBorder"] = new SolidColorBrush(Color.FromRgb(209, 209, 214));   // #D1D1D6
+                Resources["TileActiveBg"] = new SolidColorBrush(Color.FromRgb(225, 239, 255)); // #E1EFFF
+                Resources["TileActiveBorder"] = new SolidColorBrush(Color.FromRgb(0, 122, 255)); // #007AFF
+                Resources["TextPrimary"] = new SolidColorBrush(Color.FromRgb(0, 0, 0));        // #000000
+                Resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(60, 60, 67));   // #3C3C43
+                Resources["TextMuted"] = new SolidColorBrush(Color.FromRgb(142, 142, 147));    // #8E8E93
+                Resources["ProgressTrack"] = new SolidColorBrush(Color.FromRgb(229, 229, 234));
                 BtnThemeToggle.Content = "🌙 Koyu";
             }
         }
@@ -430,6 +431,13 @@ namespace EHelper
         #endregion
 
         #region Extra Actions & Settings
+
+        private void BtnRefreshTelemetry_Click(object sender, RoutedEventArgs e)
+        {
+            var telemetry = _bridge.GetTelemetry();
+            UpdateTelemetryUI(telemetry);
+            UpdateSystemResourcesUI();
+        }
 
         private void ChkAutoStart_Changed(object sender, RoutedEventArgs e)
         {

@@ -6,42 +6,47 @@
         xmlns:local="clr-namespace:EHelper"
         mc:Ignorable="d"
         Title="E-Helper"
-        Height="710" 
-        Width="430"
+        Height="670" 
+        Width="420"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
         Topmost="True"
         ResizeMode="NoResize"
-        FontFamily="Segoe UI, Inter, Arial"
+        FontFamily="Segoe UI, Segoe UI Variable Text, Arial"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
         TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        TextOptions.TextHintingMode="Fixed"
         RenderOptions.ClearTypeHint="Enabled">
 
     <Window.Resources>
-        <!-- Dynamic Theme Brushes (Default: Sleek Dark) -->
-        <SolidColorBrush x:Key="BgBrush" Color="#0B0F19"/>
-        <SolidColorBrush x:Key="CardBgBrush" Color="#151D2E"/>
-        <SolidColorBrush x:Key="CardHoverBrush" Color="#1C273C"/>
-        <SolidColorBrush x:Key="BorderBrush" Color="#22304A"/>
-        <SolidColorBrush x:Key="AccentCyan" Color="#00B4D8"/>
-        <SolidColorBrush x:Key="AccentBlue" Color="#3B82F6"/>
-        <SolidColorBrush x:Key="AccentPurple" Color="#8B5CF6"/>
-        <SolidColorBrush x:Key="TextPrimary" Color="#F8FAFC"/>
-        <SolidColorBrush x:Key="TextSecondary" Color="#94A3B8"/>
-        <SolidColorBrush x:Key="TextMuted" Color="#64748B"/>
-        <SolidColorBrush x:Key="SuccessGreen" Color="#10B981"/>
-        <SolidColorBrush x:Key="WarningOrange" Color="#F59E0B"/>
+        <!-- Dynamic Theme Tokens (Default: G-Helper Authentic Matte Dark) -->
+        <SolidColorBrush x:Key="WindowBg" Color="#161616"/>
+        <SolidColorBrush x:Key="TileBg" Color="#252525"/>
+        <SolidColorBrush x:Key="TileHoverBg" Color="#323232"/>
+        <SolidColorBrush x:Key="TileBorder" Color="#383838"/>
+        <SolidColorBrush x:Key="TileActiveBg" Color="#192738"/>
+        <SolidColorBrush x:Key="TileActiveBorder" Color="#0090FF"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#CCCCCC"/>
+        <SolidColorBrush x:Key="TextMuted" Color="#8E8E93"/>
+        <SolidColorBrush x:Key="ProgressTrack" Color="#2A2A2A"/>
+        <SolidColorBrush x:Key="AccentBlue" Color="#0090FF"/>
+        <SolidColorBrush x:Key="AccentGreen" Color="#22C55E"/>
         <SolidColorBrush x:Key="DangerRed" Color="#EF4444"/>
 
-        <!-- Mode Button Base Style -->
-        <Style x:Key="ModeButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{DynamicResource CardBgBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <!-- G-Helper Square Tile Button Style -->
+        <Style x:Key="GHelperTileStyle" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource TileBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TileBorder}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="6,8"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Padding" Value="8,10"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -49,12 +54,12 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8">
+                                CornerRadius="4">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="BorderBrush" Value="{DynamicResource AccentCyan}"/>
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource TileHoverBg}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -62,29 +67,55 @@
             </Setter>
         </Style>
 
-        <!-- Active Mode Button Style -->
-        <Style x:Key="ActiveModeButtonStyle" TargetType="Button" BasedOn="{StaticResource ModeButtonStyle}">
-            <Setter Property="Background" Value="#0A3656"/>
-            <Setter Property="Foreground" Value="#38BDF8"/>
-            <Setter Property="BorderBrush" Value="#00B4D8"/>
+        <!-- Active Selected Tile Style (Crisp Electric Blue Border) -->
+        <Style x:Key="ActiveGHelperTileStyle" TargetType="Button" BasedOn="{StaticResource GHelperTileStyle}">
+            <Setter Property="Background" Value="{DynamicResource TileActiveBg}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TileActiveBorder}"/>
+            <Setter Property="BorderThickness" Value="2"/>
         </Style>
 
-        <!-- Round Color Preset Button -->
+        <!-- Compact Bottom Action Button Style -->
+        <Style x:Key="FooterBtnStyle" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource TileBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TileBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="b" Property="Background" Value="{DynamicResource TileHoverBg}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Mini Color Preset Button -->
         <Style x:Key="ColorPresetButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="24"/>
-            <Setter Property="Height" Value="24"/>
-            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Margin" Value="2"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <Ellipse Fill="{TemplateBinding Background}" Stroke="#334155" StrokeThickness="1"/>
-                            <Ellipse x:Name="highlight" Stroke="White" StrokeThickness="2" Opacity="0"/>
+                            <Rectangle Fill="{TemplateBinding Background}" RadiusX="3" RadiusY="3" Stroke="#444444" StrokeThickness="1"/>
+                            <Rectangle x:Name="highlight" RadiusX="3" RadiusY="3" Stroke="White" StrokeThickness="1.5" Opacity="0"/>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="highlight" Property="Opacity" Value="0.9"/>
+                                <Setter TargetName="highlight" Property="Opacity" Value="1"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -93,336 +124,311 @@
         </Style>
     </Window.Resources>
 
-    <!-- Outer Shadow & Rounded Container -->
-    <Border Margin="10" 
-            Background="{DynamicResource BgBrush}" 
-            BorderBrush="{DynamicResource BorderBrush}" 
+    <!-- Outer Container (Pixel-perfect border and shadow) -->
+    <Border Margin="8" 
+            Background="{DynamicResource WindowBg}" 
+            BorderBrush="{DynamicResource TileBorder}" 
             BorderThickness="1" 
-            CornerRadius="16">
+            CornerRadius="8">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="25" ShadowDepth="6" Direction="270" Color="#000000" Opacity="0.65"/>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Direction="270" Color="#000000" Opacity="0.75"/>
         </Border.Effect>
 
-        <Grid>
+        <Grid Margin="14,12">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <!-- Header -->
-                <RowDefinition Height="*"/>    <!-- Main Content -->
-                <RowDefinition Height="Auto"/> <!-- Footer / Status -->
+                <RowDefinition Height="Auto"/> <!-- 0: Header (G-Helper Style) -->
+                <RowDefinition Height="Auto"/> <!-- 1: Performance Mode & CPU -->
+                <RowDefinition Height="Auto"/> <!-- 2: GPU Mode & Telemetry -->
+                <RowDefinition Height="Auto"/> <!-- 3: System Resources (RAM & SSD) -->
+                <RowDefinition Height="Auto"/> <!-- 4: Keyboard Lighting -->
+                <RowDefinition Height="Auto"/> <!-- 5: System Settings (Startup) -->
+                <RowDefinition Height="*"/>    <!-- 6: Spacer -->
+                <RowDefinition Height="Auto"/> <!-- 7: Footer Buttons -->
             </Grid.RowDefinitions>
 
-            <!-- 1. Header Bar -->
-            <Border Grid.Row="0" Padding="16,14,14,12" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+            <!-- 0: Header (G-Helper Title & Close) -->
+            <Grid Grid.Row="0" Margin="0,0,0,14">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="E-Helper — " FontSize="12" Foreground="{DynamicResource TextMuted}" FontWeight="Normal"/>
+                    <TextBlock x:Name="TxtModelBadge" Text="Casper Excalibur G870" FontSize="12" Foreground="{DynamicResource TextMuted}" FontWeight="SemiBold"/>
+                </StackPanel>
+
+                <Button x:Name="BtnCloseToTray" Content="✕" Width="22" Height="22" HorizontalAlignment="Right"
+                        Foreground="{DynamicResource TextMuted}" Background="Transparent" BorderThickness="0" 
+                        FontSize="11" Cursor="Hand" ToolTip="Gizle" Click="BtnCloseToTray_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="3">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="b" Property="Background" Value="#333333"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+
+            <!-- 1: Section: Performans Modu (G-Helper exact style) -->
+            <StackPanel Grid.Row="1" Margin="0,0,0,14">
+                <!-- Section Header Row: Title on Left | CPU Temp & RPM on Right -->
+                <Grid Margin="0,0,0,8">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="⚡" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtPowerModeTitle" Text="Performans Modu: Dengeli" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock Text="CPU: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
+                        <TextBlock x:Name="TxtCpuTemp" Text="53°C" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,8,0"/>
+                        <TextBlock Text="Fan: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
+                        <TextBlock x:Name="TxtCpuRpm" Text="1900RPM" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 3 G-Helper Tiles: Sessiz, Dengeli, Turbo -->
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Sessiz Button -->
+                    <Button x:Name="BtnModeOffice" Grid.Column="0" Style="{StaticResource GHelperTileStyle}" Click="BtnModeOffice_Click">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="🚲" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock Text="Sessiz" FontSize="12" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Dengeli Button -->
+                    <Button x:Name="BtnModeGaming" Grid.Column="2" Style="{StaticResource ActiveGHelperTileStyle}" Click="BtnModeGaming_Click">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="🚗" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock Text="Dengeli" FontSize="12" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Turbo (Performans) Button -->
+                    <Button x:Name="BtnModeHighPerf" Grid.Column="4" Style="{StaticResource GHelperTileStyle}" Click="BtnModeHighPerf_Click">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="🚀" FontSize="18" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                            <TextBlock Text="Turbo" FontSize="12" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <!-- 2: Section: GPU Modu & Telemetri -->
+            <StackPanel Grid.Row="2" Margin="0,0,0,14">
+                <!-- Section Header Row: Title on Left | GPU Temp & RPM on Right -->
+                <Grid Margin="0,0,0,8">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="🎮" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="GPU Modu: Ayrık / Hibrit" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock Text="GPU: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
+                        <TextBlock x:Name="TxtGpuTemp" Text="43°C" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,8,0"/>
+                        <TextBlock Text="Fan: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
+                        <TextBlock x:Name="TxtGpuRpm" Text="2200RPM" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Mini Progress bars for CPU and GPU -->
+                <Grid Margin="0,2,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ProgressBar x:Name="PbCpuTemp" Grid.Column="0" Height="3" Value="53" Maximum="100" 
+                                 Foreground="{DynamicResource AccentBlue}" Background="{DynamicResource ProgressTrack}" BorderThickness="0"/>
+                    <ProgressBar x:Name="PbGpuTemp" Grid.Column="2" Height="3" Value="43" Maximum="100" 
+                                 Foreground="{DynamicResource AccentBlue}" Background="{DynamicResource ProgressTrack}" BorderThickness="0"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- 3: Section: Sistem Kaynakları (RAM & SSD Metrics) -->
+            <StackPanel Grid.Row="3" Margin="0,0,0,14">
+                <Grid Margin="0,0,0,8">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="📊" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Sistem Kaynakları" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="TxtSysSummary" Text="Aktif İzleme" FontSize="11" Foreground="{DynamicResource TextMuted}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- 2 Compact Resource Tiles -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- RAM Metric Card -->
+                    <Border Grid.Column="0" Background="{DynamicResource TileBg}" BorderBrush="{DynamicResource TileBorder}" BorderThickness="1" CornerRadius="4" Padding="10,8">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock Text="RAM Bellek" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
+                                <TextBlock x:Name="TxtRamPercent" Text="--%" HorizontalAlignment="Right" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AccentGreen}"/>
+                            </Grid>
+                            <TextBlock x:Name="TxtRamUsage" Text="-- / -- GB" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                            <ProgressBar x:Name="PbRamUsage" Height="3" Margin="0,6,0,0" Value="50" Maximum="100" 
+                                         Foreground="{DynamicResource AccentGreen}" Background="{DynamicResource ProgressTrack}" BorderThickness="0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- SSD Metric Card -->
+                    <Border Grid.Column="2" Background="{DynamicResource TileBg}" BorderBrush="{DynamicResource TileBorder}" BorderThickness="1" CornerRadius="4" Padding="10,8">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock Text="SSD Disk (C:)" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
+                                <TextBlock x:Name="TxtSsdPercent" Text="--%" HorizontalAlignment="Right" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AccentBlue}"/>
+                            </Grid>
+                            <TextBlock x:Name="TxtSsdUsage" Text="-- / -- GB" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                            <ProgressBar x:Name="PbSsdUsage" Height="3" Margin="0,6,0,0" Value="50" Maximum="100" 
+                                         Foreground="{DynamicResource AccentBlue}" Background="{DynamicResource ProgressTrack}" BorderThickness="0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+
+            <!-- 4: Section: Laptop Klavyesi (Lighting & RGB Controls) -->
+            <StackPanel Grid.Row="4" Margin="0,0,0,14">
+                <Grid Margin="0,0,0,8">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="⌨" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Laptop Klavyesi" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock Text="Parlaklık: " FontSize="12" Foreground="{DynamicResource TextMuted}"/>
+                        <TextBlock x:Name="TxtBrightnessValue" Text="3" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Mode Selector Strip -->
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="4"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="4"/>
+                        <ColumnDefinition Width="1.2*"/>
+                        <ColumnDefinition Width="4"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="BtnLedStatic" Grid.Column="0" Content="Sabit" Style="{StaticResource ActiveGHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedStatic_Click"/>
+                    <Button x:Name="BtnLedBreathing" Grid.Column="2" Content="Nefes" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedBreathing_Click"/>
+                    <Button x:Name="BtnLedDynamic" Grid.Column="4" Content="🌈 Dinamik" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedDynamic_Click"/>
+                    <Button x:Name="BtnLedOff" Grid.Column="6" Content="Kapalı" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedOff_Click"/>
+                </Grid>
+
+                <!-- Brightness Slider -->
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Işık Gücü" FontSize="11" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Center"/>
+                    <Slider x:Name="SliderBrightness" Grid.Column="1" Margin="10,0" Minimum="0" Maximum="4" Value="3" 
+                            TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" ValueChanged="SliderBrightness_ValueChanged"/>
+                    <Border x:Name="BrdCurrentColor" Grid.Column="2" Width="18" Height="18" CornerRadius="3" Background="#00B4D8" BorderBrush="#555555" BorderThickness="1"/>
+                </Grid>
+
+                <!-- Color Palette (Only shown in Static and Breathing modes) -->
+                <Grid x:Name="PnlColorSection">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Logo Monogram -->
-                        <Border Width="30" Height="30" CornerRadius="8" Margin="0,0,10,0">
+                    <!-- Interactive Spectrum Bar -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="Renk Yelpazesi" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3"/>
+                        <Border x:Name="BrdSpectrum" Height="26" CornerRadius="3" Cursor="Hand" 
+                                MouseDown="Spectrum_MouseDown" MouseMove="Spectrum_MouseMove" BorderBrush="{DynamicResource TileBorder}" BorderThickness="1">
                             <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Color="#00B4D8" Offset="0.0"/>
-                                    <GradientStop Color="#4F46E5" Offset="1.0"/>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="#FF0000" Offset="0.0"/>
+                                    <GradientStop Color="#FFFF00" Offset="0.17"/>
+                                    <GradientStop Color="#00FF00" Offset="0.33"/>
+                                    <GradientStop Color="#00FFFF" Offset="0.50"/>
+                                    <GradientStop Color="#0000FF" Offset="0.67"/>
+                                    <GradientStop Color="#FF00FF" Offset="0.83"/>
+                                    <GradientStop Color="#FF0000" Offset="1.0"/>
                                 </LinearGradientBrush>
                             </Border.Background>
-                            <TextBlock Text="E" FontWeight="Bold" FontSize="18" Foreground="White" 
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-
-                        <StackPanel VerticalAlignment="Center">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="E-Helper" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource TextPrimary}"/>
-                                <TextBlock Text="v1.0" FontSize="11" Margin="6,3,0,0" Foreground="{DynamicResource AccentCyan}" FontWeight="SemiBold"/>
-                            </StackPanel>
-                            <TextBlock x:Name="TxtModelBadge" Text="Casper Excalibur" FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
-                        </StackPanel>
                     </StackPanel>
 
-                    <!-- Close to tray Button -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="BtnCloseToTray" Content="✕" Width="28" Height="28" 
-                                Foreground="{DynamicResource TextMuted}" Background="Transparent" BorderThickness="0" 
-                                FontSize="13" Cursor="Hand" ToolTip="Gizle" Click="BtnCloseToTray_Click">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="6">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="btnBorder" Property="Background" Value="#334155"/>
-                                                        <Setter Property="Foreground" Value="White"/>
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                    <!-- Quick Preset Colors -->
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                        <TextBlock Text="Hazır Renkler" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3"/>
+                        <UniformGrid Columns="4" Rows="2">
+                            <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#00E5FF" ToolTip="Cyan" Tag="#00E5FF" Click="ColorPreset_Click"/>
+                            <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#0090FF" ToolTip="Mavi" Tag="#0090FF" Click="ColorPreset_Click"/>
+                            <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#10B981" ToolTip="Yeşil" Tag="#10B981" Click="ColorPreset_Click"/>
+                            <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#F59E0B" ToolTip="Turuncu" Tag="#F59E0B" Click="ColorPreset_Click"/>
+                            <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EF4444" ToolTip="Kırmızı" Tag="#EF4444" Click="ColorPreset_Click"/>
+                            <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#8B5CF6" ToolTip="Mor" Tag="#8B5CF6" Click="ColorPreset_Click"/>
+                            <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EC4899" ToolTip="Pembe" Tag="#EC4899" Click="ColorPreset_Click"/>
+                            <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#FFFFFF" ToolTip="Beyaz" Tag="#FFFFFF" Click="ColorPreset_Click"/>
+                        </UniformGrid>
                     </StackPanel>
                 </Grid>
-            </Border>
+            </StackPanel>
 
-            <!-- 2. Scrollable Body Content -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="14,10">
-                <StackPanel>
+            <!-- 5: System Settings (Startup Checkbox & Status) -->
+            <Grid Grid.Row="5" Margin="0,0,0,14">
+                <CheckBox x:Name="ChkAutoStart" Content="Başlangıçta Çalıştır" 
+                          Foreground="{DynamicResource TextPrimary}" FontSize="12" 
+                          VerticalContentAlignment="Center" Checked="ChkAutoStart_Changed" Unchecked="ChkAutoStart_Changed"/>
 
-                    <!-- Section: Donanım Telemetrisi (CPU, GPU, RAM, SSD) -->
-                    <Grid Margin="0,0,0,12">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="8"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- CPU Card -->
-                        <Border Grid.Row="0" Grid.Column="0" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12,10">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,4">
-                                    <TextBlock Text="CPU" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtCpuTemp" Text="-- °C" HorizontalAlignment="Right" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource AccentCyan}"/>
-                                </Grid>
-                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                    <TextBlock Text="🌀 Fan:" FontSize="10" Foreground="{DynamicResource TextMuted}"/>
-                                    <TextBlock x:Name="TxtCpuRpm" Text="-- RPM" FontSize="10" Margin="4,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
-                                </StackPanel>
-                                <ProgressBar x:Name="PbCpuTemp" Height="4" Margin="0,8,0,0" Value="45" Maximum="100" 
-                                             Foreground="{DynamicResource AccentCyan}" Background="#0F172A" BorderThickness="0"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- GPU Card -->
-                        <Border Grid.Row="0" Grid.Column="2" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12,10">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,4">
-                                    <TextBlock Text="GPU" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtGpuTemp" Text="-- °C" HorizontalAlignment="Right" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource AccentPurple}"/>
-                                </Grid>
-                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                    <TextBlock Text="🌀 Fan:" FontSize="10" Foreground="{DynamicResource TextMuted}"/>
-                                    <TextBlock x:Name="TxtGpuRpm" Text="-- RPM" FontSize="10" Margin="4,0,0,0" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
-                                </StackPanel>
-                                <ProgressBar x:Name="PbGpuTemp" Height="4" Margin="0,8,0,0" Value="40" Maximum="100" 
-                                             Foreground="{DynamicResource AccentPurple}" Background="#0F172A" BorderThickness="0"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- RAM Card -->
-                        <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12,10">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,4">
-                                    <TextBlock Text="RAM" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtRamPercent" Text="--%" HorizontalAlignment="Right" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource SuccessGreen}"/>
-                                </Grid>
-                                <TextBlock x:Name="TxtRamUsage" Text="-- / -- GB" FontSize="10" Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold"/>
-                                <ProgressBar x:Name="PbRamUsage" Height="4" Margin="0,8,0,0" Value="50" Maximum="100" 
-                                             Foreground="{DynamicResource SuccessGreen}" Background="#0F172A" BorderThickness="0"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- SSD Card -->
-                        <Border Grid.Row="2" Grid.Column="2" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12,10">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,4">
-                                    <TextBlock Text="SSD (C:)" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtSsdPercent" Text="--%" HorizontalAlignment="Right" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource AccentBlue}"/>
-                                </Grid>
-                                <TextBlock x:Name="TxtSsdUsage" Text="-- / -- GB" FontSize="10" Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold"/>
-                                <ProgressBar x:Name="PbSsdUsage" Height="4" Margin="0,8,0,0" Value="50" Maximum="100" 
-                                             Foreground="{DynamicResource AccentBlue}" Background="#0F172A" BorderThickness="0"/>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-
-                    <!-- Section: Performans Profilleri -->
-                    <Border Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,12">
-                        <StackPanel>
-                            <TextBlock Text="PERFORMANS PROFİLİ" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,10"/>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="6"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="6"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <!-- Office Button -->
-                                <Button x:Name="BtnModeOffice" Grid.Column="0" Style="{StaticResource ModeButtonStyle}" Click="BtnModeOffice_Click">
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="🍃" FontSize="16" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="Ofis / Sessiz" FontSize="11" FontWeight="SemiBold" Margin="0,4,0,0" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-
-                                <!-- Gaming Button -->
-                                <Button x:Name="BtnModeGaming" Grid.Column="2" Style="{StaticResource ActiveModeButtonStyle}" Click="BtnModeGaming_Click">
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="⚖️" FontSize="16" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="Dengeli / Oyun" FontSize="11" FontWeight="SemiBold" Margin="0,4,0,0" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-
-                                <!-- High Performance Button -->
-                                <Button x:Name="BtnModeHighPerf" Grid.Column="4" Style="{StaticResource ModeButtonStyle}" Click="BtnModeHighPerf_Click">
-                                    <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="🚀" FontSize="16" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="Performans" FontSize="11" FontWeight="SemiBold" Margin="0,4,0,0" HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Section: RGB Klavye Aydınlatması -->
-                    <Border Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,12">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,10">
-                                <TextBlock Text="KLAVYE AYDINLATMA (RGB)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMuted}"/>
-                                <Border x:Name="BrdCurrentColor" HorizontalAlignment="Right" Width="18" Height="18" CornerRadius="9" Background="#00B4D8" BorderBrush="#334155" BorderThickness="1"/>
-                            </Grid>
-
-                            <!-- LED Modes: Sabit, Nefes, Dinamik Işık (Gökkuşağı), Kapalı -->
-                            <Grid Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="5"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="5"/>
-                                    <ColumnDefinition Width="1.3*"/>
-                                    <ColumnDefinition Width="5"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <Button x:Name="BtnLedStatic" Grid.Column="0" Content="Sabit" Style="{StaticResource ActiveModeButtonStyle}" FontSize="11" Padding="2,6" Click="BtnLedStatic_Click"/>
-                                <Button x:Name="BtnLedBreathing" Grid.Column="2" Content="Nefes" Style="{StaticResource ModeButtonStyle}" FontSize="11" Padding="2,6" Click="BtnLedBreathing_Click"/>
-                                <Button x:Name="BtnLedDynamic" Grid.Column="4" Content="🌈 Dinamik Işık" Style="{StaticResource ModeButtonStyle}" FontSize="11" Padding="2,6" Click="BtnLedDynamic_Click"/>
-                                <Button x:Name="BtnLedOff" Grid.Column="6" Content="Kapalı" Style="{StaticResource ModeButtonStyle}" FontSize="11" Padding="2,6" Click="BtnLedOff_Click"/>
-                            </Grid>
-
-                            <!-- Brightness Slider -->
-                            <Grid Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Parlaklık" FontSize="11" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
-                                <Slider x:Name="SliderBrightness" Grid.Column="1" Margin="10,0" Minimum="0" Maximum="4" Value="3" 
-                                        TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" ValueChanged="SliderBrightness_ValueChanged"/>
-                                <TextBlock x:Name="TxtBrightnessValue" Grid.Column="2" Text="3" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AccentCyan}" VerticalAlignment="Center"/>
-                            </Grid>
-
-                            <!-- Color Palette & Quick Presets (Only visible in Static and Breathing modes) -->
-                            <Grid x:Name="PnlColorSection">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>      <!-- Palette Spectrum -->
-                                    <ColumnDefinition Width="12"/>     <!-- Spacing -->
-                                    <ColumnDefinition Width="Auto"/>   <!-- Side-by-side Presets -->
-                                </Grid.ColumnDefinitions>
-
-                                <!-- Left: Interactive Color Spectrum Bar -->
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="Renk Yelpazesi" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,4"/>
-                                    <Border x:Name="BrdSpectrum" Height="32" CornerRadius="6" Cursor="Hand" 
-                                            MouseDown="Spectrum_MouseDown" MouseMove="Spectrum_MouseMove" BorderBrush="#334155" BorderThickness="1">
-                                        <Border.Background>
-                                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                                                <GradientStop Color="#FF0000" Offset="0.0"/>
-                                                <GradientStop Color="#FFFF00" Offset="0.17"/>
-                                                <GradientStop Color="#00FF00" Offset="0.33"/>
-                                                <GradientStop Color="#00FFFF" Offset="0.50"/>
-                                                <GradientStop Color="#0000FF" Offset="0.67"/>
-                                                <GradientStop Color="#FF00FF" Offset="0.83"/>
-                                                <GradientStop Color="#FF0000" Offset="1.0"/>
-                                            </LinearGradientBrush>
-                                        </Border.Background>
-                                    </Border>
-                                    
-                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                        <Border x:Name="BrdActiveColorPreview" Width="16" Height="16" CornerRadius="8" Background="#00B4D8" BorderBrush="White" BorderThickness="1.5" Margin="0,0,6,0"/>
-                                        <TextBlock Text="Canlı Seçim" FontSize="10" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </StackPanel>
-
-                                <!-- Right: Quick Preset Colors Grid -->
-                                <StackPanel Grid.Column="2" VerticalAlignment="Top">
-                                    <TextBlock Text="Hazır Renkler" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,4"/>
-                                    <UniformGrid Columns="4" Rows="2">
-                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#00E5FF" ToolTip="Cyan" Tag="#00E5FF" Click="ColorPreset_Click"/>
-                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#3B82F6" ToolTip="Mavi" Tag="#3B82F6" Click="ColorPreset_Click"/>
-                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#10B981" ToolTip="Yeşil" Tag="#10B981" Click="ColorPreset_Click"/>
-                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#F59E0B" ToolTip="Turuncu" Tag="#F59E0B" Click="ColorPreset_Click"/>
-                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EF4444" ToolTip="Kırmızı" Tag="#EF4444" Click="ColorPreset_Click"/>
-                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#8B5CF6" ToolTip="Mor" Tag="#8B5CF6" Click="ColorPreset_Click"/>
-                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EC4899" ToolTip="Pembe" Tag="#EC4899" Click="ColorPreset_Click"/>
-                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#FFFFFF" ToolTip="Beyaz" Tag="#FFFFFF" Click="ColorPreset_Click"/>
-                                    </UniformGrid>
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Section: Ayarlar -->
-                    <Border Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,6">
-                        <StackPanel>
-                            <CheckBox x:Name="ChkAutoStart" Content="Windows ile Birlikte Başlat" 
-                                      Foreground="{DynamicResource TextSecondary}" FontSize="11" 
-                                      VerticalContentAlignment="Center" Checked="ChkAutoStart_Changed" Unchecked="ChkAutoStart_Changed"/>
-                        </StackPanel>
-                    </Border>
-
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Ellipse x:Name="DotStatus" Width="7" Height="7" Fill="{DynamicResource AccentGreen}" Margin="0,0,5,0"/>
+                    <TextBlock x:Name="TxtHardwareStatus" Text="WMI ACPI • Aktif" FontSize="11" Foreground="{DynamicResource TextMuted}"/>
                 </StackPanel>
-            </ScrollViewer>
+            </Grid>
 
-            <!-- 3. Footer Bar with Theme Toggle & Connection Status -->
-            <Border Grid.Row="2" Padding="14,10" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" CornerRadius="0,0,16,16">
-                <Grid>
-                    <!-- Left: Status Indicator -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse x:Name="DotStatus" Width="8" Height="8" Fill="{DynamicResource SuccessGreen}" Margin="0,0,6,0"/>
-                        <TextBlock x:Name="TxtHardwareStatus" Text="WMI ACPI SMI • Bağlı" FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
-                    </StackPanel>
+            <!-- 7: Footer Action Buttons (G-Helper bottom strip) -->
+            <Grid Grid.Row="7" Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- Right: Theme Switcher & Exit App -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <!-- Theme Toggle Button -->
-                        <Button x:Name="BtnThemeToggle" Content="☀️ Açık" 
-                                Foreground="{DynamicResource TextSecondary}" Background="Transparent" 
-                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                Padding="8,3" FontSize="10" Margin="0,0,10,0" Cursor="Hand" Click="BtnThemeToggle_Click">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="6">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                <!-- Theme Toggle Button -->
+                <Button x:Name="BtnThemeToggle" Grid.Column="0" Content="☀️ Açık" Style="{StaticResource FooterBtnStyle}" Click="BtnThemeToggle_Click"/>
 
-                        <Button x:Name="BtnExitApp" Content="Çıkış" 
-                                Foreground="{DynamicResource DangerRed}" Background="Transparent" BorderThickness="0" 
-                                FontSize="11" FontWeight="SemiBold" Cursor="Hand" Click="BtnExitApp_Click"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                <!-- Refresh / Re-query Button -->
+                <Button x:Name="BtnRefreshTelemetry" Grid.Column="2" Content="🔄 Yenile" Style="{StaticResource FooterBtnStyle}" Click="BtnRefreshTelemetry_Click"/>
+
+                <!-- Exit App Button -->
+                <Button x:Name="BtnExitApp" Grid.Column="4" Content="🚪 Çıkış" Style="{StaticResource FooterBtnStyle}" Click="BtnExitApp_Click"/>
+            </Grid>
         </Grid>
     </Border>
 </Window>
