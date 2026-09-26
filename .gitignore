@@ -6,6 +6,7 @@ excalibur_hardware_control_analysis.md
 bin/
 obj/
 publish/
+publish-standalone/
 [Dd]ebug/
 [Rr]elease/
 x64/
