@@ -5,7 +5,7 @@
 # E-Helper — Lightweight Control Tool for Casper Excalibur Laptops
 
 <p align="center">
-  <a href="https://github.com/berkevnl/e-helper/releases"><img src="https://img.shields.io/github/v/release/berkevnl/e-helper?color=0078D4&style=flat-square" alt="Latest Release"></a>
+  <a href="https://github.com/berkevnl/e-helper/releases"><img src="https://img.shields.io/badge/Version-v1.1.0-0078D4?style=flat-square" alt="Version v1.1.0"></a>
   <a href="https://github.com/berkevnl/e-helper/releases/latest/download/EHelper.exe"><img src="https://img.shields.io/badge/Download-E--Helper.exe-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Direct Download"></a>
   <a href="https://github.com/berkevnl/e-helper/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-green.svg?style=flat-square" alt="License"></a>
   <a href="#-memory--resource-footprint"><img src="https://img.shields.io/badge/RAM-5--10_MB-success?style=flat-square" alt="RAM Usage"></a>
@@ -37,23 +37,9 @@ Compatible with **Excalibur G770, G780, G850, G870, G900, G911, G920**, and othe
 2. **Zero Bloatware & Portable:** A single standalone `.exe` file. No installer, no background telemetry services, no scheduled tasks, and no system clutter.
 3. **Native Direct Hardware Bridge:** Communicates directly with the Embedded Controller (EC / ACPI BIOS) through Windows Native WMI SMI (`RW_GMWMI`), completely bypassing heavy third-party vendor services.
 4. **Instant Flyout UI:** Docks neatly in the Windows System Tray (notification area). Clicking the tray icon opens a sleek, sharp control panel in the corner of your screen.
-5. **Bidirectional Hardware Sync:** Respects physical `Fn + Space` key shortcuts and hardware brightness changes in real-time.
+5. **Hardware-Software Synchronization:** Real-time synchronization between the laptop hardware state and the application.
 6. **Built-in Auto Updater:** One-click GitHub Release version checker and updater.
 7. **Clean Aesthetics:** Tailored dark and light themes inspired by modern minimalist design.
-
----
-
-## 📊 Comparison: E-Helper vs. Excalibur Control Center
-
-| Feature | Casper Excalibur Control Center | E-Helper |
-| :--- | :---: | :---: |
-| **Background RAM Usage** | 150 MB – 400 MB+ | **~5 – 10 MB** |
-| **Active Window RAM** | 300 MB – 600 MB | **~20 – 35 MB** |
-| **Background Services** | 3 to 5 persistent services | **0 (None)** |
-| **Startup Time** | 15 – 30 seconds | **< 1 second** |
-| **Installation** | ~500 MB setup wizard | **Portable single file** |
-| **Telemetry / Tracking** | Yes | **None (100% Offline & Open Source)** |
-| **System Tray Flyout** | Heavy window | **G-Helper style fast flyout** |
 
 ---
 
@@ -80,7 +66,7 @@ Compatible with **Excalibur G770, G780, G850, G870, G900, G911, G920**, and othe
 
 ### 4. Usability & Customization
 * **Start with Windows:** Optional registry-based auto-start toggle with zero background overhead.
-* **One-Click Theme Switch:** Seamless toggle between G-Helper Dark Mode and Clean Light Mode.
+* **One-Click Theme Switch:** Seamless toggle between Sleek Dark Mode and Clean Light Mode.
 * **Bilingual UI:** Instant one-click language toggle between **Türkçe (TR)** and **English (EN)**.
 
 ---
@@ -122,7 +108,7 @@ Casper Excalibur serisi dizüstü bilgisayarlar için resmi **Excalibur Control 
 * **Kurulumsuz & Taşınabilir (Portable):** Tek bir `.exe` dosyasından çalışır. Sisteme sürücü, arka plan servisi veya kalıntı bırakmaz.
 * **Doğrudan Donanım Köprüsü:** Harici hantal servislere bağımlı olmadan, Windows'un yerel WMI ACPI SMI (`RW_GMWMI`) kanalı üzerinden doğrudan gömülü denetleyiciyle (EC / BIOS) haberleşir.
 * **Donanımsal 3 Kademeli Aydınlatma:** Excalibur donanımının orijinal çalışma standardına tam uyumlu Kapalı (%0), %50 ve %100 kademeleri.
-* **Çift Yönlü Senkronizasyon:** Klavyedeki `Fn + Space` kısayoluyla yapılan parlaklık değişikliklerini anında arayüze yansıtır.
+* **Donanım ve Uygulama Eş Zamanlılığı:** Donanım durumu ile uygulamanın gerçek zamanlı eş zamanlılığı.
 * **Tek Tıkla Otomatik Güncelleme:** GitHub Release üzerinden yeni sürümleri otomatik kontrol eder ve kullanıcı onayıyla günceller.
 
 ### 📋 Temel Özellikler

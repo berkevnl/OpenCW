@@ -5,7 +5,7 @@
 # E-Helper — Casper Excalibur Dizüstü Bilgisayarlar İçin Hafif Kontrol Aracı
 
 <p align="center">
-  <a href="https://github.com/berkevnl/e-helper/releases"><img src="https://img.shields.io/github/v/release/berkevnl/e-helper?color=0078D4&style=flat-square" alt="Son Sürüm"></a>
+  <a href="https://github.com/berkevnl/e-helper/releases"><img src="https://img.shields.io/badge/Sürüm-v1.1.0-0078D4?style=flat-square" alt="Sürüm v1.1.0"></a>
   <a href="https://github.com/berkevnl/e-helper/releases/latest/download/EHelper.exe"><img src="https://img.shields.io/badge/İndir-E--Helper.exe-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Doğrudan İndir"></a>
   <a href="https://github.com/berkevnl/e-helper/blob/main/LICENSE"><img src="https://img.shields.io/badge/Lisans-GPL--3.0-green.svg?style=flat-square" alt="Lisans"></a>
   <a href="#-bellek-ram-ve-sistem-kullanımı"><img src="https://img.shields.io/badge/RAM-5--10_MB-success?style=flat-square" alt="RAM Tüketimi"></a>
@@ -34,23 +34,9 @@ Casper Excalibur oyuncu dizüstü bilgisayarları için resmi **Excalibur Contro
 2. **Kurulumsuz & Sıfır Şişkinlik (Bloat-Free):** Kurulum gerektirmeyen tek bir `.exe` dosyasından ibarettir. Sisteme ek sürücü, servis, telemetri takipçisi veya başlangıç görevleri yüklemez.
 3. **Doğrudan Yerel Donanım Köprüsü:** Üçüncü taraf hantal servisler yerine Windows'un yerel WMI ACPI SMI (`RW_GMWMI`) kanalı üzerinden anakart gömülü denetleyicisiyle (EC / BIOS) doğrudan haberleşir.
 4. **Hızlı Sistem Tepsisi Paneli:** Görev çubuğunda pencere kaplamaz, sistem tepsisine yerleşir. Simgeye tıklandığında anında ekranın köşesinde modern panel açılır.
-5. **Çift Yönlü Donanım Senkronizasyonu:** Klavyedeki fiziksel `Fn + Space` aydınlatma geçişlerini donanım seviyesinde algılar ve arayüze anında yansıtır.
+5. **Donanım ve Uygulama Eş Zamanlılığı:** Donanım durumu ile uygulamanın gerçek zamanlı eş zamanlılığı.
 6. **Entegre Otomatik Güncelleyici:** GitHub Release üzerinden yeni sürümleri tek tıkla sorgulayıp günceller.
 7. **Modern Tasarım:** Karanlık (Dark) ve Aydınlık (Light) tema seçenekleri.
-
----
-
-## 📊 Karşılaştırma: E-Helper vs. Excalibur Control Center
-
-| Özellik | Casper Excalibur Control Center | E-Helper |
-| :--- | :---: | :---: |
-| **Arka Plan RAM Tüketimi** | 150 MB – 400 MB+ | **~5 – 10 MB** |
-| **Ön Plan (Aktif Panel) RAM** | 300 MB – 600 MB | **~20 – 35 MB** |
-| **Arka Plan Servisleri** | 3 - 5 adet sürekli çalışan servis | **0 (Hiçbiri)** |
-| **Açılış Hızı** | 15 – 30 saniye | **< 1 saniye** |
-| **Kurulum Boyutu** | ~500 MB kurulum paketi | **Kurulumsuz taşınabilir tek dosya** |
-| **Telemetri / Takip** | Var | **Yok (Tamamen Çevrimdışı ve Açık Kaynak)** |
-| **Arayüz Tepkiselliği** | Hantal ve yavaş | **G-Helper tarzı anlık uçan pencere** |
 
 ---
 
@@ -77,7 +63,7 @@ Casper Excalibur oyuncu dizüstü bilgisayarları için resmi **Excalibur Contro
 
 ### 4. Kullanılabilirlik ve Özelleştirme
 * **Başlangıçta Çalıştır:** Windows başlangıcında otomatik başlatma seçeneği (sıfır ek yük).
-* **Tema Seçimi:** G-Helper Koyu Mod ile Temiz Açık Mod arasında tek tıkla geçiş.
+* **Tema Seçimi:** Koyu Mod ile Açık Mod arasında tek tıkla geçiş.
 * **Hızlı Dil Değişimi:** Tek tıkla **Türkçe (TR)** ve **İngilizce (EN)** arayüz desteği.
 
 ---

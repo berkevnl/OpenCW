@@ -14,7 +14,7 @@ namespace EHelper.Services
     public static class UpdateService
     {
         private const string GitHubRepo = "berkevnl/e-helper";
-        public const string CurrentVersion = "1.0.0";
+        public const string CurrentVersion = "1.1.0";
 
         private static readonly HttpClient HttpClient = new();
 
@@ -94,32 +94,25 @@ namespace EHelper.Services
                 }
 
                 string promptMsg = isEnglish
-                    ? $"A new version is available: v{cleanVersion}\n(Current version: v{CurrentVersion})\n\nRelease notes:\n{body}\n\nDo you want to update to v{cleanVersion} now?"
-                    : $"Yeni bir sürüm mevcut: v{cleanVersion}\n(Mevcut sürüm: v{CurrentVersion})\n\nSürüm notları:\n{body}\n\nv{cleanVersion} sürümüne güncellemek istiyor musunuz?";
+                    ? $"A new version is available: v{cleanVersion}\n(Current version: v{CurrentVersion})\n\nRelease notes:\n{body}\n\nDo you want to download v{cleanVersion} now?"
+                    : $"Yeni bir sürüm mevcut: v{cleanVersion}\n(Mevcut sürüm: v{CurrentVersion})\n\nSürüm notları:\n{body}\n\nv{cleanVersion} sürümünü indirmek istiyor musunuz?";
 
                 var result = MessageBox.Show(
                     owner ?? Application.Current.MainWindow,
                     promptMsg,
                     isEnglish ? "Update Available" : "Güncelleme Mevcut",
                     MessageBoxButton.YesNo,
-                    MessageBoxImage.Question
+                    MessageBoxImage.Information
                 );
 
-                if (result != MessageBoxResult.Yes) return;
-
-                if (string.IsNullOrEmpty(downloadUrl))
+                if (result == MessageBoxResult.Yes)
                 {
-                    // Fall back to opening GitHub release page in browser
-                    string releasePage = root.TryGetProperty("html_url", out var pageProp) 
-                        ? pageProp.GetString() ?? $"https://github.com/{GitHubRepo}/releases" 
-                        : $"https://github.com/{GitHubRepo}/releases";
+                    string targetUrl = !string.IsNullOrEmpty(downloadUrl)
+                        ? downloadUrl
+                        : $"https://github.com/{GitHubRepo}/releases/latest";
 
-                    Process.Start(new ProcessStartInfo(releasePage) { UseShellExecute = true });
-                    return;
+                    Process.Start(new ProcessStartInfo(targetUrl) { UseShellExecute = true });
                 }
-
-                // Download the asset and self-update
-                await PerformUpdateAsync(downloadUrl, isEnglish, owner);
             }
             catch (Exception ex)
             {
@@ -128,66 +121,6 @@ namespace EHelper.Services
                     : $"Güncelleme kontrolü başarısız oldu: {ex.Message}";
 
                 MessageBox.Show(owner ?? Application.Current.MainWindow, errMsg, "E-Helper", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private static async Task PerformUpdateAsync(string downloadUrl, bool isEnglish, Window? owner)
-        {
-            string currentExe = Environment.ProcessPath ?? "";
-            if (string.IsNullOrEmpty(currentExe) || !File.Exists(currentExe))
-            {
-                Process.Start(new ProcessStartInfo(downloadUrl) { UseShellExecute = true });
-                return;
-            }
-
-            string tempDownloadPath = Path.Combine(Path.GetTempPath(), $"EHelper_update_{Guid.NewGuid():N}.exe");
-            string updaterScript = Path.Combine(Path.GetTempPath(), $"EHelper_updater_{Guid.NewGuid():N}.bat");
-
-            try
-            {
-                var bytes = await HttpClient.GetByteArrayAsync(downloadUrl);
-                await File.WriteAllBytesAsync(tempDownloadPath, bytes);
-
-                int pid = Environment.ProcessId;
-
-                // Write batch script to wait for this process, replace EXE, and restart
-                string scriptContent = $@"@echo off
-timeout /t 1 /nobreak >nul
-:waitloop
-tasklist /fi ""pid eq {pid}"" | find ""{pid}"" >nul
-if not errorlevel 1 (
-    timeout /t 1 /nobreak >nul
-    goto waitloop
-)
-copy /y ""{tempDownloadPath}"" ""{currentExe}"" >nul
-del ""{tempDownloadPath}"" >nul
-start """" ""{currentExe}""
-del ""%~f0"" & exit
-";
-
-                await File.WriteAllTextAsync(updaterScript, scriptContent);
-
-                var psi = new ProcessStartInfo
-                {
-                    FileName = "cmd.exe",
-                    Arguments = $"/c \"\"{updaterScript}\"\"",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-
-                Process.Start(psi);
-
-                // Exit cleanly so user settings in AppData are preserved and file unlocked
-                Application.Current.Shutdown();
-            }
-            catch (Exception ex)
-            {
-                string failMsg = isEnglish
-                    ? $"Failed to apply update: {ex.Message}\nYou can download it manually from GitHub."
-                    : $"Güncelleme uygulanamadı: {ex.Message}\nManuel olarak GitHub'dan indirebilirsiniz.";
-
-                MessageBox.Show(owner ?? Application.Current.MainWindow, failMsg, "E-Helper", MessageBoxButton.OK, MessageBoxImage.Error);
-                Process.Start(new ProcessStartInfo($"https://github.com/{GitHubRepo}/releases") { UseShellExecute = true });
             }
         }
     }
