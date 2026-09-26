@@ -16,6 +16,7 @@ namespace EHelper
         private HardwareMonitorService? _monitor;
         private SystemTrayManager? _trayManager;
         private MainWindow? _mainWindow;
+        private int _telemetryCounter;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -54,12 +55,27 @@ namespace EHelper
                 // 5. Initialize System Tray (Notification Area Icon)
                 _trayManager = new SystemTrayManager(_mainWindow, ShutdownApp);
 
+                // Initial working set trim to drop memory to G-Helper levels (~2-5 MB)
+                MemoryOptimizer.TrimMemory();
+
                 // Update tray tooltip on telemetry
                 _monitor.TelemetryUpdated += t =>
                 {
                     if (t.IsAvailable)
                     {
                         _trayManager.UpdateTooltip($"E-Helper | CPU: {t.CpuTemperature}°C | GPU: {t.GpuTemperature}°C");
+                    }
+
+                    // Periodically keep background memory lean if flyout window is not open
+                    if (++_telemetryCounter % 10 == 0)
+                    {
+                        Dispatcher.InvokeAsync(() =>
+                        {
+                            if (_mainWindow != null && !_mainWindow.IsVisible)
+                            {
+                                MemoryOptimizer.TrimMemory();
+                            }
+                        });
                     }
                 };
             }

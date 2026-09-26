@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:EHelper"
         mc:Ignorable="d"
         Title="E-Helper"
-        Height="680" 
+        Height="630" 
         Width="380"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -41,7 +41,7 @@
             <Setter Property="BorderBrush" Value="#22304A"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="6,8"/>
+            <Setter Property="Padding" Value="4,7"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -72,9 +72,9 @@
 
         <!-- Round Color Preset Button -->
         <Style x:Key="ColorPresetButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="24"/>
-            <Setter Property="Height" Value="24"/>
-            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Margin" Value="2"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -85,7 +85,7 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="highlight" Property="Opacity" Value="0.8"/>
+                                <Setter TargetName="highlight" Property="Opacity" Value="0.9"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -101,7 +101,7 @@
             BorderThickness="1" 
             CornerRadius="16">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="25" ShadowDepth="6" Direction="270" Color="#000000" Opacity="0.6"/>
+            <DropShadowEffect BlurRadius="25" ShadowDepth="6" Direction="270" Color="#000000" Opacity="0.65"/>
         </Border.Effect>
 
         <Grid>
@@ -137,7 +137,7 @@
                                 <TextBlock Text="E-Helper" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextPrimary}"/>
                                 <TextBlock Text="v1.0" FontSize="11" Margin="6,3,0,0" Foreground="{StaticResource AccentCyan}" FontWeight="SemiBold"/>
                             </StackPanel>
-                            <TextBlock x:Name="TxtModelBadge" Text="Casper Excalibur G920" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                            <TextBlock x:Name="TxtModelBadge" Text="Casper Excalibur G870" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
                         </StackPanel>
                     </StackPanel>
 
@@ -193,7 +193,6 @@
                                     <TextBlock Text="🌀 Fan:" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                                     <TextBlock x:Name="TxtCpuRpm" Text="-- RPM" FontSize="11" Margin="4,0,0,0" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
                                 </StackPanel>
-                                <!-- Temperature Mini Progress -->
                                 <ProgressBar x:Name="PbCpuTemp" Height="4" Margin="0,8,0,0" Value="45" Maximum="100" 
                                              Foreground="{StaticResource AccentCyan}" Background="#0F172A" BorderThickness="0"/>
                             </StackPanel>
@@ -210,7 +209,6 @@
                                     <TextBlock Text="🌀 Fan:" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                                     <TextBlock x:Name="TxtGpuRpm" Text="-- RPM" FontSize="11" Margin="4,0,0,0" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
                                 </StackPanel>
-                                <!-- Temperature Mini Progress -->
                                 <ProgressBar x:Name="PbGpuTemp" Height="4" Margin="0,8,0,0" Value="40" Maximum="100" 
                                              Foreground="{StaticResource AccentPurple}" Background="#0F172A" BorderThickness="0"/>
                             </StackPanel>
@@ -230,7 +228,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Office / Quiet Button -->
+                                <!-- Office Button -->
                                 <Button x:Name="BtnModeOffice" Grid.Column="0" Style="{StaticResource ModeButtonStyle}" Click="BtnModeOffice_Click">
                                     <StackPanel HorizontalAlignment="Center">
                                         <TextBlock Text="🍃" FontSize="16" HorizontalAlignment="Center"/>
@@ -265,7 +263,7 @@
                                 <Border x:Name="BrdCurrentColor" HorizontalAlignment="Right" Width="18" Height="18" CornerRadius="9" Background="#00B4D8" BorderBrush="#334155" BorderThickness="1"/>
                             </Grid>
 
-                            <!-- LED Modes -->
+                            <!-- LED Modes (5 Modes: Sabit, Nefes, Döngü, Gökkuşağı, Kapalı) -->
                             <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -275,12 +273,15 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="4"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Button x:Name="BtnLedStatic" Grid.Column="0" Content="Sabit" Style="{StaticResource ActiveModeButtonStyle}" FontSize="11" Padding="2,6" Click="BtnLedStatic_Click"/>
-                                <Button x:Name="BtnLedBreathing" Grid.Column="2" Content="Nefes" Style="{StaticResource ModeButtonStyle}" FontSize="11" Padding="2,6" Click="BtnLedBreathing_Click"/>
-                                <Button x:Name="BtnLedCycle" Grid.Column="4" Content="Döngü" Style="{StaticResource ModeButtonStyle}" FontSize="11" Padding="2,6" Click="BtnLedCycle_Click"/>
-                                <Button x:Name="BtnLedOff" Grid.Column="6" Content="Kapalı" Style="{StaticResource ModeButtonStyle}" FontSize="11" Padding="2,6" Click="BtnLedOff_Click"/>
+                                <Button x:Name="BtnLedStatic" Grid.Column="0" Content="Sabit" Style="{StaticResource ActiveModeButtonStyle}" FontSize="10" Padding="1,6" Click="BtnLedStatic_Click"/>
+                                <Button x:Name="BtnLedBreathing" Grid.Column="2" Content="Nefes" Style="{StaticResource ModeButtonStyle}" FontSize="10" Padding="1,6" Click="BtnLedBreathing_Click"/>
+                                <Button x:Name="BtnLedCycle" Grid.Column="4" Content="Döngü" Style="{StaticResource ModeButtonStyle}" FontSize="10" Padding="1,6" Click="BtnLedCycle_Click"/>
+                                <Button x:Name="BtnLedRainbow" Grid.Column="6" Content="Gökkuşağı" Style="{StaticResource ModeButtonStyle}" FontSize="10" Padding="1,6" Click="BtnLedRainbow_Click"/>
+                                <Button x:Name="BtnLedOff" Grid.Column="8" Content="Kapalı" Style="{StaticResource ModeButtonStyle}" FontSize="10" Padding="1,6" Click="BtnLedOff_Click"/>
                             </Grid>
 
                             <!-- Brightness Slider -->
@@ -296,47 +297,67 @@
                                 <TextBlock x:Name="TxtBrightnessValue" Grid.Column="2" Text="3" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" VerticalAlignment="Center"/>
                             </Grid>
 
-                            <!-- Quick Preset Colors -->
-                            <TextBlock Text="Hızlı Renkler" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,6"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#00E5FF" ToolTip="Cyan" Tag="#00E5FF" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#3B82F6" ToolTip="Mavi" Tag="#3B82F6" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#10B981" ToolTip="Yeşil" Tag="#10B981" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#F59E0B" ToolTip="Turuncu" Tag="#F59E0B" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EF4444" ToolTip="Kırmızı" Tag="#EF4444" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#8B5CF6" ToolTip="Mor" Tag="#8B5CF6" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EC4899" ToolTip="Pembe" Tag="#EC4899" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#FFFFFF" ToolTip="Beyaz" Tag="#FFFFFF" Click="ColorPreset_Click"/>
-                            </StackPanel>
-
-                            <!-- Custom HEX Color Input -->
-                            <Grid Margin="0,4,0,0">
+                            <!-- Color Palette & Quick Presets (Only for Static and Breathing modes) -->
+                            <Grid x:Name="PnlColorSection">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="8"/>
-                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>      <!-- Palette Spectrum -->
+                                    <ColumnDefinition Width="10"/>     <!-- Spacing -->
+                                    <ColumnDefinition Width="Auto"/>   <!-- Side-by-side Presets -->
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="TxtHexColor" Text="#00B4D8" MaxLength="7" 
-                                         Background="#0B0F19" Foreground="{StaticResource TextPrimary}" 
-                                         BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" 
-                                         Padding="8,5" FontSize="11" VerticalContentAlignment="Center"/>
-                                <Button x:Name="BtnApplyHex" Grid.Column="2" Content="Rengi Uygula" Style="{StaticResource ModeButtonStyle}" 
-                                        FontSize="11" Padding="10,5" Click="BtnApplyHex_Click"/>
+
+                                <!-- Left: Interactive Color Spectrum Bar -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Renk Paleti (Tıklayın / Kaydırın)" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,5"/>
+                                    <Border x:Name="BrdSpectrum" Height="30" CornerRadius="6" Cursor="Hand" 
+                                            MouseDown="Spectrum_MouseDown" MouseMove="Spectrum_MouseMove" BorderBrush="#334155" BorderThickness="1">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                                <GradientStop Color="#FF0000" Offset="0.0"/>
+                                                <GradientStop Color="#FFFF00" Offset="0.17"/>
+                                                <GradientStop Color="#00FF00" Offset="0.33"/>
+                                                <GradientStop Color="#00FFFF" Offset="0.50"/>
+                                                <GradientStop Color="#0000FF" Offset="0.67"/>
+                                                <GradientStop Color="#FF00FF" Offset="0.83"/>
+                                                <GradientStop Color="#FF0000" Offset="1.0"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                        <Border x:Name="BrdActiveColorPreview" Width="16" Height="16" CornerRadius="8" Background="#00B4D8" BorderBrush="White" BorderThickness="1.5" Margin="0,0,6,0"/>
+                                        <TextBlock x:Name="TxtColorName" Text="Seçili Renk" FontSize="10" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Right: Quick Preset Colors (Side-by-side) -->
+                                <StackPanel Grid.Column="2" VerticalAlignment="Top">
+                                    <TextBlock Text="Hazır Renkler" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,5"/>
+                                    <UniformGrid Columns="4" Rows="2">
+                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#00E5FF" ToolTip="Cyan" Tag="#00E5FF" Click="ColorPreset_Click"/>
+                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#3B82F6" ToolTip="Mavi" Tag="#3B82F6" Click="ColorPreset_Click"/>
+                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#10B981" ToolTip="Yeşil" Tag="#10B981" Click="ColorPreset_Click"/>
+                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#F59E0B" ToolTip="Turuncu" Tag="#F59E0B" Click="ColorPreset_Click"/>
+                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EF4444" ToolTip="Kırmızı" Tag="#EF4444" Click="ColorPreset_Click"/>
+                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#8B5CF6" ToolTip="Mor" Tag="#8B5CF6" Click="ColorPreset_Click"/>
+                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EC4899" ToolTip="Pembe" Tag="#EC4899" Click="ColorPreset_Click"/>
+                                        <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#FFFFFF" ToolTip="Beyaz" Tag="#FFFFFF" Click="ColorPreset_Click"/>
+                                    </UniformGrid>
+                                </StackPanel>
                             </Grid>
+
+                            <!-- Informational Notice for Dynamic Modes (Cycle & Rainbow) -->
+                            <Border x:Name="BrdDynamicModeNotice" Visibility="Collapsed" Background="#0F172A" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="8" Padding="10,8" Margin="0,4,0,0">
+                                <TextBlock Text="🌈 Bu modda RGB renk geçişleri donanım tarafından otomatik yürütülür." FontSize="10" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center"/>
+                            </Border>
                         </StackPanel>
                     </Border>
 
-                    <!-- Section: Hızlı Eylemler & Ayarlar -->
+                    <!-- Section: Ayarlar -->
                     <Border Background="{StaticResource CardBgBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,8">
                         <StackPanel>
-                            <!-- Reset Fans to Auto -->
-                            <Button x:Name="BtnResetFans" Content="🔄 Fanları Otomatik BIOS Kontrolüne Sıfırla" 
-                                    Style="{StaticResource ModeButtonStyle}" Margin="0,0,0,8" FontSize="11" Padding="8,7" Click="BtnResetFans_Click"/>
-
-                            <!-- Windows Startup Checkbox -->
                             <CheckBox x:Name="ChkAutoStart" Content="Windows ile Birlikte Başlat" 
                                       Foreground="{StaticResource TextSecondary}" FontSize="11" 
-                                      VerticalContentAlignment="Center" Margin="2,4,0,0" Checked="ChkAutoStart_Changed" Unchecked="ChkAutoStart_Changed"/>
+                                      VerticalContentAlignment="Center" Margin="2,0,0,0" Checked="ChkAutoStart_Changed" Unchecked="ChkAutoStart_Changed"/>
                         </StackPanel>
                     </Border>
 

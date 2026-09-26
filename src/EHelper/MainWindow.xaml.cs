@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using EHelper.Config;
 using EHelper.Hardware;
@@ -12,6 +13,8 @@ using Microsoft.Win32;
 using Button = System.Windows.Controls.Button;
 using Color = System.Windows.Media.Color;
 using MessageBox = System.Windows.MessageBox;
+using Point = System.Windows.Point;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace EHelper
 {
@@ -65,7 +68,6 @@ namespace EHelper
 
             SliderBrightness.Value = _brightness;
             TxtBrightnessValue.Text = _brightness.ToString();
-            TxtHexColor.Text = s.HexColor;
             UpdateColorPreview();
 
             ChkAutoStart.IsChecked = IsStartupEnabled();
@@ -91,8 +93,8 @@ namespace EHelper
         {
             if (!t.IsAvailable)
             {
-                TxtCpuTemp.Text = "N/A";
-                TxtGpuTemp.Text = "N/A";
+                TxtCpuTemp.Text = "-- °C";
+                TxtGpuTemp.Text = "-- °C";
                 TxtCpuRpm.Text = "0 RPM";
                 TxtGpuRpm.Text = "0 RPM";
                 return;
@@ -122,7 +124,7 @@ namespace EHelper
             TxtGpuRpm.Text = $"{t.GpuFanRpm} RPM";
         }
 
-        #region Flyout & Auto-Hide
+        #region Flyout & Auto-Hide & Memory Trim
 
         public void PositionBottomRight()
         {
@@ -136,6 +138,7 @@ namespace EHelper
             if (IsVisible)
             {
                 Hide();
+                MemoryOptimizer.TrimMemory();
             }
             else
             {
@@ -151,11 +154,14 @@ namespace EHelper
             base.OnDeactivated(e);
             // Hide automatically when user clicks anywhere outside the flyout
             Hide();
+            // Drop RAM working set immediately back to G-Helper levels (~2-5 MB)
+            MemoryOptimizer.TrimMemory();
         }
 
         private void BtnCloseToTray_Click(object sender, RoutedEventArgs e)
         {
             Hide();
+            MemoryOptimizer.TrimMemory();
         }
 
         #endregion
@@ -218,6 +224,11 @@ namespace EHelper
             SetLedMode(ExcaliburLedMode.ColorfulCycle);
         }
 
+        private void BtnLedRainbow_Click(object sender, RoutedEventArgs e)
+        {
+            SetLedMode(ExcaliburLedMode.Rainbow);
+        }
+
         private void BtnLedOff_Click(object sender, RoutedEventArgs e)
         {
             SetLedMode(ExcaliburLedMode.Off);
@@ -238,7 +249,15 @@ namespace EHelper
             BtnLedStatic.Style = _currentLedMode == ExcaliburLedMode.Static ? activeStyle : normalStyle;
             BtnLedBreathing.Style = _currentLedMode == ExcaliburLedMode.Breathing ? activeStyle : normalStyle;
             BtnLedCycle.Style = _currentLedMode == ExcaliburLedMode.ColorfulCycle ? activeStyle : normalStyle;
+            BtnLedRainbow.Style = _currentLedMode == ExcaliburLedMode.Rainbow ? activeStyle : normalStyle;
             BtnLedOff.Style = _currentLedMode == ExcaliburLedMode.Off ? activeStyle : normalStyle;
+
+            // Palette and preset colors only apply to Static and Breathing modes
+            bool isManualColor = _currentLedMode == ExcaliburLedMode.Static || _currentLedMode == ExcaliburLedMode.Breathing;
+            bool isDynamic = _currentLedMode == ExcaliburLedMode.ColorfulCycle || _currentLedMode == ExcaliburLedMode.Rainbow;
+
+            PnlColorSection.Visibility = isManualColor ? Visibility.Visible : Visibility.Collapsed;
+            BrdDynamicModeNotice.Visibility = isDynamic ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void SliderBrightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -250,42 +269,80 @@ namespace EHelper
             ApplyLedSettings();
         }
 
+        private void Spectrum_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            PickColorFromSpectrum(e.GetPosition(BrdSpectrum));
+        }
+
+        private void Spectrum_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                PickColorFromSpectrum(e.GetPosition(BrdSpectrum));
+            }
+        }
+
+        private void PickColorFromSpectrum(Point pos)
+        {
+            double width = BrdSpectrum.ActualWidth;
+            if (width <= 0) return;
+
+            double fraction = Math.Clamp(pos.X / width, 0.0, 1.0);
+            double hue = fraction * 360.0;
+            var (r, g, b) = HsvToRgb(hue, 1.0, 1.0);
+            SetRgbColor(r, g, b);
+        }
+
+        private static (byte R, byte G, byte B) HsvToRgb(double h, double s, double v)
+        {
+            double c = v * s;
+            double x = c * (1 - Math.Abs((h / 60.0) % 2 - 1));
+            double m = v - c;
+
+            double r = 0, g = 0, b = 0;
+            if (h < 60) { r = c; g = x; b = 0; }
+            else if (h < 120) { r = x; g = c; b = 0; }
+            else if (h < 180) { r = 0; g = c; b = x; }
+            else if (h < 240) { r = 0; g = x; b = c; }
+            else if (h < 300) { r = x; g = 0; b = c; }
+            else { r = c; g = 0; b = x; }
+
+            return ((byte)((r + m) * 255), (byte)((g + m) * 255), (byte)((b + m) * 255));
+        }
+
         private void ColorPreset_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is string hex)
             {
-                TxtHexColor.Text = hex;
-                ParseAndSetColor(hex);
+                string cleanHex = hex.TrimStart('#');
+                if (cleanHex.Length == 6 &&
+                    byte.TryParse(cleanHex[..2], NumberStyles.HexNumber, null, out byte r) &&
+                    byte.TryParse(cleanHex[2..4], NumberStyles.HexNumber, null, out byte g) &&
+                    byte.TryParse(cleanHex[4..6], NumberStyles.HexNumber, null, out byte b))
+                {
+                    SetRgbColor(r, g, b);
+                }
             }
         }
 
-        private void BtnApplyHex_Click(object sender, RoutedEventArgs e)
+        private void SetRgbColor(byte r, byte g, byte b)
         {
-            ParseAndSetColor(TxtHexColor.Text.Trim());
-        }
+            _red = r;
+            _green = g;
+            _blue = b;
 
-        private void ParseAndSetColor(string hex)
-        {
-            if (string.IsNullOrWhiteSpace(hex)) return;
-
-            string cleanHex = hex.TrimStart('#');
-            if (cleanHex.Length == 6 &&
-                byte.TryParse(cleanHex[..2], NumberStyles.HexNumber, null, out byte r) &&
-                byte.TryParse(cleanHex[2..4], NumberStyles.HexNumber, null, out byte g) &&
-                byte.TryParse(cleanHex[4..6], NumberStyles.HexNumber, null, out byte b))
-            {
-                _red = r;
-                _green = g;
-                _blue = b;
-
-                UpdateColorPreview();
-                ApplyLedSettings();
-            }
+            UpdateColorPreview();
+            ApplyLedSettings();
         }
 
         private void UpdateColorPreview()
         {
-            BrdCurrentColor.Background = new SolidColorBrush(Color.FromRgb(_red, _green, _blue));
+            var brush = new SolidColorBrush(Color.FromRgb(_red, _green, _blue));
+            BrdCurrentColor.Background = brush;
+            if (BrdActiveColorPreview != null)
+            {
+                BrdActiveColorPreview.Background = brush;
+            }
         }
 
         private void ApplyLedSettings()
@@ -310,17 +367,6 @@ namespace EHelper
         #endregion
 
         #region Extra Actions & Settings
-
-        private void BtnResetFans_Click(object sender, RoutedEventArgs e)
-        {
-            _bridge.ResetFansToAuto();
-            MessageBox.Show(
-                "Fan denetimi fabrika BIOS akıllı moduna sıfırlandı.", 
-                "E-Helper", 
-                MessageBoxButton.OK, 
-                MessageBoxImage.Information
-            );
-        }
 
         private void ChkAutoStart_Changed(object sender, RoutedEventArgs e)
         {

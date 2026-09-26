@@ -35,6 +35,7 @@ namespace EHelper.Hardware
         Static = 1,
         Breathing = 3,
         ColorfulCycle = 6,
+        Rainbow = 7,
         Ambilight = 7
     }
 
