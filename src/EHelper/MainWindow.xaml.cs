@@ -258,6 +258,17 @@ namespace EHelper
         private void SetLedMode(ExcaliburLedMode mode)
         {
             _currentLedMode = mode;
+            if (_currentLedMode != ExcaliburLedMode.Off)
+            {
+                // Ensure brightness is at least 3 when turning on from Off
+                if (_brightness == 0)
+                {
+                    _brightness = 3;
+                    if (SliderBrightness != null) SliderBrightness.Value = 3;
+                    UpdateBrightnessUI();
+                }
+            }
+
             UpdateLedModeButtonsUI();
             ApplyLedSettings();
         }
@@ -296,7 +307,6 @@ namespace EHelper
             };
 
             if (TxtBrightnessIcon != null) TxtBrightnessIcon.Text = symbol;
-            if (TxtBrightnessSliderIcon != null) TxtBrightnessSliderIcon.Text = symbol;
         }
 
         private void SliderBrightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -304,6 +314,13 @@ namespace EHelper
             if (!_isInitialized || SliderBrightness == null) return;
             _brightness = (byte)SliderBrightness.Value;
             UpdateBrightnessUI();
+
+            // If user moves brightness slider while in Off mode, switch to Static mode automatically
+            if (_currentLedMode == ExcaliburLedMode.Off && _brightness > 0)
+            {
+                _currentLedMode = ExcaliburLedMode.Static;
+                UpdateLedModeButtonsUI();
+            }
 
             ApplyLedSettings();
         }

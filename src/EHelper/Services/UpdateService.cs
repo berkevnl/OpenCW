@@ -36,8 +36,8 @@ namespace EHelper.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     string notFoundMsg = isEnglish
-                        ? "No new releases found on GitHub yet, or GitHub repository is not accessible."
-                        : "GitHub üzerinde henüz yeni bir sürüm yayınlanmamış veya bağlantı kurulamadı.";
+                        ? "No published Releases found on GitHub yet, or repository is Private.\nUpdates will be downloaded here automatically once a release is published."
+                        : "GitHub üzerinde henüz yayınlanmış bir Sürüm (Release) bulunmuyor veya depo gizli (Private) durumda.\nİlk sürüm yayınlandığında güncellemeler buradan otomatik kontrol edilecektir.";
 
                     MessageBox.Show(owner ?? Application.Current.MainWindow, notFoundMsg, "E-Helper", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;

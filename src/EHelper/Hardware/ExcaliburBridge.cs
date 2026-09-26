@@ -253,15 +253,31 @@ namespace EHelper.Hardware
 
         public bool SetAllKeyboardLed(ExcaliburLedMode mode, byte brightness, byte r, byte g, byte b)
         {
-            // Set both Zone 6 (ALLKBLED) and Zone 0 (All) for comprehensive coverage
-            bool res1 = SetLed(ExcaliburLedZone.AllKeyboard, mode, brightness, r, g, b);
-            bool res2 = SetLed(ExcaliburLedZone.All, mode, brightness, r, g, b);
-            return res1 || res2;
+            // Ensure visible minimum brightness
+            if (brightness == 0) brightness = 1;
+
+            // Prime the EC controller PWM if switching into breathing or dynamic modes
+            if (mode == ExcaliburLedMode.Breathing || mode == ExcaliburLedMode.ColorfulCycle)
+            {
+                SetLed(ExcaliburLedZone.All, ExcaliburLedMode.Static, brightness, r, g, b);
+                SetLed(ExcaliburLedZone.AllKeyboard, ExcaliburLedMode.Static, brightness, r, g, b);
+            }
+
+            // Set both Zone 0 (Master), Zone 6 (ALLKBLED), and individual zones (3, 4, 5) to ensure EC wakes up
+            bool res0 = SetLed(ExcaliburLedZone.All, mode, brightness, r, g, b);
+            bool res6 = SetLed(ExcaliburLedZone.AllKeyboard, mode, brightness, r, g, b);
+            bool res3 = SetLed(ExcaliburLedZone.KeyboardLeft, mode, brightness, r, g, b);
+            bool res4 = SetLed(ExcaliburLedZone.KeyboardCenter, mode, brightness, r, g, b);
+            bool res5 = SetLed(ExcaliburLedZone.KeyboardRight, mode, brightness, r, g, b);
+
+            return res0 || res6 || res3;
         }
 
         public bool TurnOffAllLights()
         {
-            return SetLed(ExcaliburLedZone.All, ExcaliburLedMode.Off, 0, 0, 0, 0);
+            bool res1 = SetLed(ExcaliburLedZone.AllKeyboard, ExcaliburLedMode.Off, 0, 0, 0, 0);
+            bool res2 = SetLed(ExcaliburLedZone.All, ExcaliburLedMode.Off, 0, 0, 0, 0);
+            return res1 || res2;
         }
 
         public void Dispose()
