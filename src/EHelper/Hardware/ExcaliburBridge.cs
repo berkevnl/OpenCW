@@ -253,8 +253,10 @@ namespace EHelper.Hardware
 
         public bool SetAllKeyboardLed(ExcaliburLedMode mode, byte brightness, byte r, byte g, byte b)
         {
-            // Ensure visible minimum brightness
-            if (brightness == 0) brightness = 1;
+            if (mode == ExcaliburLedMode.Off || brightness == 0)
+            {
+                return TurnOffAllLights();
+            }
 
             // Prime the EC controller PWM if switching into breathing or dynamic modes
             if (mode == ExcaliburLedMode.Breathing || mode == ExcaliburLedMode.ColorfulCycle)

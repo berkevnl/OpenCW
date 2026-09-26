@@ -348,7 +348,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock x:Name="LblBrightnessTitle" Text="Parlaklık" FontSize="11" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Center"/>
-                    <Slider x:Name="SliderBrightness" Grid.Column="1" Margin="12,0,0,0" Minimum="0" Maximum="4" Value="3" 
+                    <Slider x:Name="SliderBrightness" Grid.Column="1" Margin="12,0,0,0" Minimum="0" Maximum="2" Value="2" 
                             TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" ValueChanged="SliderBrightness_ValueChanged"/>
                 </Grid>
 

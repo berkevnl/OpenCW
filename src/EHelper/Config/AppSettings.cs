@@ -7,7 +7,7 @@ namespace EHelper.Config
     {
         public ExcaliburPowerMode PowerMode { get; set; } = ExcaliburPowerMode.Gaming;
         public ExcaliburLedMode LedMode { get; set; } = ExcaliburLedMode.Static;
-        public byte LedBrightness { get; set; } = 3;
+        public byte LedBrightness { get; set; } = 2;
         public byte Red { get; set; } = 0;
         public byte Green { get; set; } = 180;
         public byte Blue { get; set; } = 255;

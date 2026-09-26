@@ -27,6 +27,7 @@ namespace EHelper
 
         private ExcaliburPowerMode _currentPowerMode;
         private ExcaliburLedMode _currentLedMode;
+        private ExcaliburLedMode _lastActiveLedMode = ExcaliburLedMode.Static;
         private byte _brightness;
         private byte _red;
         private byte _green;
@@ -54,11 +55,21 @@ namespace EHelper
             var s = _config.CurrentSettings;
             _currentPowerMode = s.PowerMode;
             _currentLedMode = s.LedMode;
-            _brightness = s.LedBrightness;
+            _brightness = Math.Min(s.LedBrightness, (byte)2);
             _red = s.Red;
             _green = s.Green;
             _blue = s.Blue;
             _isDarkTheme = s.IsDarkTheme;
+
+            if (_currentLedMode != ExcaliburLedMode.Off)
+            {
+                _lastActiveLedMode = _currentLedMode;
+                if (_brightness == 0) _brightness = 2;
+            }
+            else
+            {
+                _brightness = 0;
+            }
 
             // Load Language
             LocalizationManager.CurrentLanguage = s.Language ?? "TR";
@@ -258,13 +269,26 @@ namespace EHelper
         private void SetLedMode(ExcaliburLedMode mode)
         {
             _currentLedMode = mode;
-            if (_currentLedMode != ExcaliburLedMode.Off)
+            if (_currentLedMode == ExcaliburLedMode.Off)
             {
-                // Ensure brightness is at least 3 when turning on from Off
+                _brightness = 0;
+                if (SliderBrightness != null && SliderBrightness.Value != 0)
+                {
+                    SliderBrightness.Value = 0;
+                }
+                UpdateBrightnessUI();
+            }
+            else
+            {
+                _lastActiveLedMode = _currentLedMode;
+                // If brightness was 0, turn on to 100% (level 2)
                 if (_brightness == 0)
                 {
-                    _brightness = 3;
-                    if (SliderBrightness != null) SliderBrightness.Value = 3;
+                    _brightness = 2;
+                    if (SliderBrightness != null && SliderBrightness.Value != 2)
+                    {
+                        SliderBrightness.Value = 2;
+                    }
                     UpdateBrightnessUI();
                 }
             }
@@ -296,30 +320,62 @@ namespace EHelper
 
         private void UpdateBrightnessUI()
         {
-            string symbol = _brightness switch
-            {
-                0 => "🌑",
-                1 => "🔅",
-                2 => "🔆",
-                3 => "🔆",
-                4 => "☀️",
-                _ => "🔆"
-            };
+            string symbol;
+            string text;
 
-            if (TxtBrightnessIcon != null) TxtBrightnessIcon.Text = symbol;
+            switch (_brightness)
+            {
+                case 0:
+                    symbol = "🌑";
+                    text = LocalizationManager.IsTurkish ? "Kapalı (%0)" : "Off (0%)";
+                    break;
+                case 1:
+                    symbol = "🔅";
+                    text = "%50";
+                    break;
+                case 2:
+                default:
+                    symbol = "🔆";
+                    text = "%100";
+                    break;
+            }
+
+            if (TxtBrightnessIcon != null)
+            {
+                TxtBrightnessIcon.Text = symbol;
+                TxtBrightnessIcon.ToolTip = text;
+            }
+
+            if (SliderBrightness != null)
+            {
+                SliderBrightness.ToolTip = text;
+            }
         }
 
         private void SliderBrightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!_isInitialized || SliderBrightness == null) return;
-            _brightness = (byte)SliderBrightness.Value;
+            _brightness = (byte)Math.Clamp(SliderBrightness.Value, 0, 2);
             UpdateBrightnessUI();
 
-            // If user moves brightness slider while in Off mode, switch to Static mode automatically
-            if (_currentLedMode == ExcaliburLedMode.Off && _brightness > 0)
+            if (_brightness == 0)
             {
-                _currentLedMode = ExcaliburLedMode.Static;
-                UpdateLedModeButtonsUI();
+                // En sola çekildiğinde: Kapalı seçilmiş gibi ışığı gerçekten kapatır
+                if (_currentLedMode != ExcaliburLedMode.Off)
+                {
+                    _lastActiveLedMode = _currentLedMode;
+                    _currentLedMode = ExcaliburLedMode.Off;
+                    UpdateLedModeButtonsUI();
+                }
+            }
+            else
+            {
+                // 1 (%50) veya 2 (%100): Kapalı moddaysa son aktif modu veya Sabit modu açar
+                if (_currentLedMode == ExcaliburLedMode.Off)
+                {
+                    _currentLedMode = (_lastActiveLedMode != ExcaliburLedMode.Off) ? _lastActiveLedMode : ExcaliburLedMode.Static;
+                    UpdateLedModeButtonsUI();
+                }
             }
 
             ApplyLedSettings();
@@ -400,13 +456,17 @@ namespace EHelper
         {
             if (!_isInitialized || _bridge == null || _config == null) return;
 
-            if (_currentLedMode == ExcaliburLedMode.Off)
+            if (_currentLedMode == ExcaliburLedMode.Off || _brightness == 0)
             {
                 _bridge.TurnOffAllLights();
             }
             else
             {
-                _bridge.SetAllKeyboardLed(_currentLedMode, _brightness, _red, _green, _blue);
+                // Excalibur EC PWM donanım kademeleri:
+                // Kademe 1 => Seviye 2 (%50 PWM)
+                // Kademe 2 => Seviye 4 (%100 PWM)
+                byte ecBrightness = _brightness == 1 ? (byte)2 : (byte)4;
+                _bridge.SetAllKeyboardLed(_currentLedMode, ecBrightness, _red, _green, _blue);
             }
 
             _config.CurrentSettings.LedMode = _currentLedMode;
@@ -559,6 +619,8 @@ namespace EHelper
             {
                 BtnThemeToggle.Content = _isDarkTheme ? LocalizationManager.ThemeLight : LocalizationManager.ThemeDark;
             }
+
+            UpdateBrightnessUI();
         }
 
         private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
