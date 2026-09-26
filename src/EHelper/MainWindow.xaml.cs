@@ -355,27 +355,27 @@ namespace EHelper
         private void SliderBrightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (!_isInitialized || SliderBrightness == null) return;
-            _brightness = (byte)Math.Clamp(SliderBrightness.Value, 0, 2);
-            UpdateBrightnessUI();
+            byte val = (byte)Math.Clamp(SliderBrightness.Value, 0, 2);
 
-            if (_brightness == 0)
+            if (val == 0)
             {
-                // En sola çekildiğinde: Kapalı seçilmiş gibi ışığı gerçekten kapatır
+                // En sola (0) çekildiğinde: Kapalı moduna alınmış gibi klavye aydınlatmasını kapat
                 if (_currentLedMode != ExcaliburLedMode.Off)
                 {
                     _lastActiveLedMode = _currentLedMode;
-                    _currentLedMode = ExcaliburLedMode.Off;
-                    UpdateLedModeButtonsUI();
                 }
+                SetLedMode(ExcaliburLedMode.Off);
+                return;
             }
-            else
+
+            _brightness = val;
+            UpdateBrightnessUI();
+
+            // 1 (%50) veya 2 (%100): Kapalı moddaysa son aktif modu veya Sabit modu açar
+            if (_currentLedMode == ExcaliburLedMode.Off)
             {
-                // 1 (%50) veya 2 (%100): Kapalı moddaysa son aktif modu veya Sabit modu açar
-                if (_currentLedMode == ExcaliburLedMode.Off)
-                {
-                    _currentLedMode = (_lastActiveLedMode != ExcaliburLedMode.Off) ? _lastActiveLedMode : ExcaliburLedMode.Static;
-                    UpdateLedModeButtonsUI();
-                }
+                _currentLedMode = (_lastActiveLedMode != ExcaliburLedMode.Off) ? _lastActiveLedMode : ExcaliburLedMode.Static;
+                UpdateLedModeButtonsUI();
             }
 
             ApplyLedSettings();

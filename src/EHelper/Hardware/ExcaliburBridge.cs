@@ -277,9 +277,12 @@ namespace EHelper.Hardware
 
         public bool TurnOffAllLights()
         {
-            bool res1 = SetLed(ExcaliburLedZone.AllKeyboard, ExcaliburLedMode.Off, 0, 0, 0, 0);
-            bool res2 = SetLed(ExcaliburLedZone.All, ExcaliburLedMode.Off, 0, 0, 0, 0);
-            return res1 || res2;
+            bool res0 = SetLed(ExcaliburLedZone.All, ExcaliburLedMode.Off, 0, 0, 0, 0);
+            bool res6 = SetLed(ExcaliburLedZone.AllKeyboard, ExcaliburLedMode.Off, 0, 0, 0, 0);
+            bool res3 = SetLed(ExcaliburLedZone.KeyboardLeft, ExcaliburLedMode.Off, 0, 0, 0, 0);
+            bool res4 = SetLed(ExcaliburLedZone.KeyboardCenter, ExcaliburLedMode.Off, 0, 0, 0, 0);
+            bool res5 = SetLed(ExcaliburLedZone.KeyboardRight, ExcaliburLedMode.Off, 0, 0, 0, 0);
+            return res0 || res6 || res3;
         }
 
         public void Dispose()
