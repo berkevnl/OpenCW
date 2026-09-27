@@ -73,8 +73,9 @@ namespace OpenCW.Services
                     return;
                 }
 
-                // New version found!
+                // New version found! Prioritize .zip release package over raw .exe for faster/smaller download
                 string? downloadUrl = null;
+                string? fallbackExeUrl = null;
 
                 if (root.TryGetProperty("assets", out var assetsProp) && assetsProp.ValueKind == JsonValueKind.Array)
                 {
@@ -84,14 +85,20 @@ namespace OpenCW.Services
                             asset.TryGetProperty("browser_download_url", out var urlProp))
                         {
                             string name = nameProp.GetString() ?? "";
-                            if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                            if (name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
                             {
                                 downloadUrl = urlProp.GetString();
                                 break;
                             }
+                            else if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && fallbackExeUrl == null)
+                            {
+                                fallbackExeUrl = urlProp.GetString();
+                            }
                         }
                     }
                 }
+
+                downloadUrl ??= fallbackExeUrl;
 
                 string promptMsg = isEnglish
                     ? $"A new version is available: v{cleanVersion}\n(Current version: v{CurrentVersion})\n\nRelease notes:\n{body}\n\nDo you want to download v{cleanVersion} now?"
