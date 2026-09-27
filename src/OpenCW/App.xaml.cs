@@ -177,6 +177,20 @@ namespace OpenCW
                 {
                     _mainWindow.ToggleFlyout();
                 }
+                else
+                {
+                    // If started via Windows logon, refresh tray icon after a brief delay
+                    // in case Windows Explorer was still finishing taskbar notification area registration
+                    System.Threading.Tasks.Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await System.Threading.Tasks.Task.Delay(2500);
+                            _trayManager?.EnsureVisible();
+                        }
+                        catch { }
+                    });
+                }
 
                 // Initial working set trim to drop memory to ultra-lightweight levels (~2-5 MB)
                 MemoryOptimizer.TrimMemory();

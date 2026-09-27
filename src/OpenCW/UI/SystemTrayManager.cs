@@ -93,6 +93,22 @@ namespace OpenCW.UI
             }
         }
 
+        public void EnsureVisible()
+        {
+            if (!_isDisposed && _notifyIcon != null)
+            {
+                try
+                {
+                    _notifyIcon.Visible = false;
+                    _notifyIcon.Visible = true;
+                }
+                catch
+                {
+                    // Ignore transient Win32 tray notification errors
+                }
+            }
+        }
+
         public void Dispose()
         {
             if (_isDisposed) return;
