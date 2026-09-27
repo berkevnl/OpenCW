@@ -350,15 +350,15 @@
                             <ColumnDefinition Width="4"/>
                             <ColumnDefinition Width="1.1*"/>
                             <ColumnDefinition Width="4"/>
-                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1.1*"/>
                             <ColumnDefinition Width="4"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="1.2*"/>
                         </Grid.ColumnDefinitions>
 
                         <Button x:Name="BtnLedStatic" Grid.Column="0" Content="✨ Sabit" Style="{StaticResource ActiveGHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedStatic_Click"/>
                         <Button x:Name="BtnLedBreathing" Grid.Column="2" Content="💨 Nefes" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedBreathing_Click"/>
-                        <Button x:Name="BtnLedDynamic" Grid.Column="4" Content="🌈 Dinamik" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedDynamic_Click"/>
-                        <Button x:Name="BtnLedOff" Grid.Column="6" Content="⭕ Kapalı" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedOff_Click"/>
+                        <Button x:Name="BtnLedDynamic" Grid.Column="4" Content="💫 Dinamik" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedDynamic_Click"/>
+                        <Button x:Name="BtnLedRainbow" Grid.Column="6" Content="🌈 Gökkuşağı" Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="2,6" Click="BtnLedRainbow_Click"/>
                     </Grid>
 
                     <!-- Brightness Slider -->
@@ -372,47 +372,29 @@
                                 TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" ValueChanged="SliderBrightness_ValueChanged"/>
                     </Grid>
 
-                    <!-- Color Palette (Only shown in Static and Breathing modes) -->
-                    <Grid x:Name="PnlColorSection">
+                    <!-- Color Picker Action Strip (Only shown in Static and Breathing modes) -->
+                    <Grid x:Name="PnlColorSection" Margin="0,0,0,4">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Interactive Spectrum Bar -->
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                            <TextBlock x:Name="TxtSpectrumTitle" Text="Renk Yelpazesi" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3"/>
-                            <Border x:Name="BrdSpectrum" Height="26" CornerRadius="3" Cursor="Hand" 
-                                    MouseDown="Spectrum_MouseDown" MouseMove="Spectrum_MouseMove" BorderBrush="{DynamicResource TileBorder}" BorderThickness="1">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                                        <GradientStop Color="#FF0000" Offset="0.0"/>
-                                        <GradientStop Color="#FFFF00" Offset="0.17"/>
-                                        <GradientStop Color="#00FF00" Offset="0.33"/>
-                                        <GradientStop Color="#00FFFF" Offset="0.50"/>
-                                        <GradientStop Color="#0000FF" Offset="0.67"/>
-                                        <GradientStop Color="#FF00FF" Offset="0.83"/>
-                                        <GradientStop Color="#FF0000" Offset="1.0"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                            </Border>
-                        </StackPanel>
+                        <!-- Active Color Preview & Hex Display -->
+                        <Border Grid.Column="0" Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource TileBorder}" 
+                                BorderThickness="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border x:Name="BrdActiveColorPreview" Width="14" Height="14" CornerRadius="7" 
+                                        Background="#00B4FF" BorderBrush="#80FFFFFF" BorderThickness="1" Margin="0,0,6,0"/>
+                                <TextBlock x:Name="TxtActiveHex" Text="#00B4FF" FontSize="11" FontFamily="Consolas, Segoe UI" 
+                                           Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
 
-                        <!-- Quick Preset Colors -->
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                            <TextBlock x:Name="TxtPresetsTitle" Text="Hazır Renkler" FontSize="10" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3"/>
-                            <UniformGrid Columns="4" Rows="2">
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#00E5FF" ToolTip="Cyan" Tag="#00E5FF" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#0090FF" ToolTip="Mavi" Tag="#0090FF" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#10B981" ToolTip="Yeşil" Tag="#10B981" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#F59E0B" ToolTip="Turuncu" Tag="#F59E0B" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EF4444" ToolTip="Kırmızı" Tag="#EF4444" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#8B5CF6" ToolTip="Mor" Tag="#8B5CF6" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#EC4899" ToolTip="Pembe" Tag="#EC4899" Click="ColorPreset_Click"/>
-                                <Button Style="{StaticResource ColorPresetButtonStyle}" Background="#FFFFFF" ToolTip="Beyaz" Tag="#FFFFFF" Click="ColorPreset_Click"/>
-                            </UniformGrid>
-                        </StackPanel>
+                        <!-- Open Detailed Professional Color Picker Dialog -->
+                        <Button x:Name="BtnCustomColor" Grid.Column="2" Content="🎨 Özel Renk Seç" 
+                                Style="{StaticResource GHelperTileStyle}" FontSize="11" Padding="8,6" 
+                                Click="BtnCustomColor_Click"/>
                     </Grid>
                 </StackPanel>
 
