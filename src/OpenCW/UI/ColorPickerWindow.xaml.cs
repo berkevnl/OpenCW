@@ -27,12 +27,13 @@ namespace OpenCW.UI
         private double _saturation;  // 0.0 - 1.0
         private double _value;       // 0.0 - 1.0
 
-        private bool _isUpdating;
+        private bool _isUpdating = true;
         private bool _isDraggingSv;
         private bool _isDraggingHue;
 
         public ColorPickerWindow(byte initialR, byte initialG, byte initialB)
         {
+            _isUpdating = true;
             InitializeComponent();
 
             OriginalRed = initialR;
@@ -43,12 +44,28 @@ namespace OpenCW.UI
             SelectedGreen = initialG;
             SelectedBlue = initialB;
 
-            BrdOldColor.Background = new SolidColorBrush(Color.FromRgb(initialR, initialG, initialB));
+            if (BrdOldColor != null)
+            {
+                BrdOldColor.Background = new SolidColorBrush(Color.FromRgb(initialR, initialG, initialB));
+            }
 
             RgbToHsv(initialR, initialG, initialB, out _hue, out _saturation, out _value);
 
+            // Populate text inputs safely before wiring events
+            if (TxtHexInput != null) TxtHexInput.Text = $"#{initialR:X2}{initialG:X2}{initialB:X2}";
+            if (TxtRInput != null) TxtRInput.Text = initialR.ToString();
+            if (TxtGInput != null) TxtGInput.Text = initialG.ToString();
+            if (TxtBInput != null) TxtBInput.Text = initialB.ToString();
+
+            // Wire events after control tree is established
+            if (TxtHexInput != null) TxtHexInput.TextChanged += TxtHexInput_TextChanged;
+            if (TxtRInput != null) TxtRInput.TextChanged += TxtRgbInput_TextChanged;
+            if (TxtGInput != null) TxtGInput.TextChanged += TxtRgbInput_TextChanged;
+            if (TxtBInput != null) TxtBInput.TextChanged += TxtRgbInput_TextChanged;
+
             Loaded += (s, e) =>
             {
+                _isUpdating = false;
                 UpdateFromHsv(updateInputs: true, updateReticle: true, updateHueThumb: true);
             };
         }
@@ -83,7 +100,7 @@ namespace OpenCW.UI
 
         private void SvBox_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed && GridSvBox != null)
             {
                 _isDraggingSv = true;
                 ((UIElement)sender).CaptureMouse();
@@ -93,7 +110,7 @@ namespace OpenCW.UI
 
         private void SvBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_isDraggingSv && e.LeftButton == MouseButtonState.Pressed)
+            if (_isDraggingSv && e.LeftButton == MouseButtonState.Pressed && GridSvBox != null)
             {
                 UpdateSvFromMouse(e.GetPosition(GridSvBox));
             }
@@ -110,6 +127,7 @@ namespace OpenCW.UI
 
         private void UpdateSvFromMouse(Point pos)
         {
+            if (GridSvBox == null) return;
             double width = GridSvBox.ActualWidth;
             double height = GridSvBox.ActualHeight;
             if (width <= 0 || height <= 0) return;
@@ -126,7 +144,7 @@ namespace OpenCW.UI
 
         private void HueBar_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed && GridHueBar != null)
             {
                 _isDraggingHue = true;
                 ((UIElement)sender).CaptureMouse();
@@ -136,7 +154,7 @@ namespace OpenCW.UI
 
         private void HueBar_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_isDraggingHue && e.LeftButton == MouseButtonState.Pressed)
+            if (_isDraggingHue && e.LeftButton == MouseButtonState.Pressed && GridHueBar != null)
             {
                 UpdateHueFromMouse(e.GetPosition(GridHueBar));
             }
@@ -153,6 +171,7 @@ namespace OpenCW.UI
 
         private void UpdateHueFromMouse(Point pos)
         {
+            if (GridHueBar == null) return;
             double width = GridHueBar.ActualWidth;
             if (width <= 0) return;
 
@@ -178,7 +197,7 @@ namespace OpenCW.UI
 
         private void TxtHexInput_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (_isUpdating) return;
+            if (_isUpdating || TxtHexInput == null) return;
             string text = TxtHexInput.Text.Trim();
             if (text.StartsWith("#") && (text.Length == 7))
             {
@@ -188,7 +207,7 @@ namespace OpenCW.UI
 
         private void TxtRgbInput_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (_isUpdating) return;
+            if (_isUpdating || TxtRInput == null || TxtGInput == null || TxtBInput == null) return;
 
             if (byte.TryParse(TxtRInput.Text, out byte r) &&
                 byte.TryParse(TxtGInput.Text, out byte g) &&
@@ -202,7 +221,7 @@ namespace OpenCW.UI
                 UpdateFromHsv(updateInputs: false, updateReticle: true, updateHueThumb: true);
 
                 _isUpdating = true;
-                TxtHexInput.Text = $"#{r:X2}{g:X2}{b:X2}";
+                if (TxtHexInput != null) TxtHexInput.Text = $"#{r:X2}{g:X2}{b:X2}";
                 _isUpdating = false;
             }
         }
@@ -225,7 +244,7 @@ namespace OpenCW.UI
                 if (!fromHexInput)
                 {
                     _isUpdating = true;
-                    TxtHexInput.Text = $"#{r:X2}{g:X2}{b:X2}";
+                    if (TxtHexInput != null) TxtHexInput.Text = $"#{r:X2}{g:X2}{b:X2}";
                     _isUpdating = false;
                 }
             }
@@ -237,47 +256,60 @@ namespace OpenCW.UI
 
         private void UpdateFromHsv(bool updateInputs, bool updateReticle, bool updateHueThumb)
         {
-            var (r, g, b) = HsvToRgb(_hue, _saturation, _value);
-            SelectedRed = r;
-            SelectedGreen = g;
-            SelectedBlue = b;
-
-            // 1. Update pure Hue background of 2D SV Box
-            var (pureR, pureG, pureB) = HsvToRgb(_hue, 1.0, 1.0);
-            StopHueColor.Color = Color.FromRgb(pureR, pureG, pureB);
-
-            // 2. Update New Color Preview Box
-            BrdNewColor.Background = new SolidColorBrush(Color.FromRgb(r, g, b));
-
-            // 3. Update Text Inputs if not currently typed by user
-            if (updateInputs)
+            try
             {
-                _isUpdating = true;
-                TxtHexInput.Text = $"#{r:X2}{g:X2}{b:X2}";
-                TxtRInput.Text = r.ToString();
-                TxtGInput.Text = g.ToString();
-                TxtBInput.Text = b.ToString();
-                _isUpdating = false;
-            }
+                var (r, g, b) = HsvToRgb(_hue, _saturation, _value);
+                SelectedRed = r;
+                SelectedGreen = g;
+                SelectedBlue = b;
 
-            // 4. Update Reticle Indicator Position on 2D SV Box
-            if (updateReticle && GridSvBox.ActualWidth > 0 && GridSvBox.ActualHeight > 0)
+                // 1. Update pure Hue background of 2D SV Box
+                if (StopHueColor != null)
+                {
+                    var (pureR, pureG, pureB) = HsvToRgb(_hue, 1.0, 1.0);
+                    StopHueColor.Color = Color.FromRgb(pureR, pureG, pureB);
+                }
+
+                // 2. Update New Color Preview Box
+                if (BrdNewColor != null)
+                {
+                    BrdNewColor.Background = new SolidColorBrush(Color.FromRgb(r, g, b));
+                }
+
+                // 3. Update Text Inputs if requested
+                if (updateInputs)
+                {
+                    _isUpdating = true;
+                    if (TxtHexInput != null) TxtHexInput.Text = $"#{r:X2}{g:X2}{b:X2}";
+                    if (TxtRInput != null) TxtRInput.Text = r.ToString();
+                    if (TxtGInput != null) TxtGInput.Text = g.ToString();
+                    if (TxtBInput != null) TxtBInput.Text = b.ToString();
+                    _isUpdating = false;
+                }
+
+                // 4. Update Reticle Indicator Position on 2D SV Box
+                if (updateReticle && GridSvBox != null && Reticle != null && GridSvBox.ActualWidth > 0 && GridSvBox.ActualHeight > 0)
+                {
+                    double x = _saturation * GridSvBox.ActualWidth - (Reticle.Width / 2.0);
+                    double y = (1.0 - _value) * GridSvBox.ActualHeight - (Reticle.Height / 2.0);
+                    Canvas.SetLeft(Reticle, Math.Clamp(x, -Reticle.Width / 2.0, GridSvBox.ActualWidth - Reticle.Width / 2.0));
+                    Canvas.SetTop(Reticle, Math.Clamp(y, -Reticle.Height / 2.0, GridSvBox.ActualHeight - Reticle.Height / 2.0));
+                }
+
+                // 5. Update Hue Slider Indicator Position
+                if (updateHueThumb && GridHueBar != null && HueThumb != null && GridHueBar.ActualWidth > 0)
+                {
+                    double thumbX = (_hue / 360.0) * (GridHueBar.ActualWidth - HueThumb.Width);
+                    Canvas.SetLeft(HueThumb, Math.Clamp(thumbX, 0, GridHueBar.ActualWidth - HueThumb.Width));
+                }
+
+                // 6. Broadcast Real-time Live Preview to physical keyboard hardware!
+                ColorPreviewChanged?.Invoke(r, g, b);
+            }
+            catch
             {
-                double x = _saturation * GridSvBox.ActualWidth - (Reticle.Width / 2.0);
-                double y = (1.0 - _value) * GridSvBox.ActualHeight - (Reticle.Height / 2.0);
-                Canvas.SetLeft(Reticle, Math.Clamp(x, -Reticle.Width / 2.0, GridSvBox.ActualWidth - Reticle.Width / 2.0));
-                Canvas.SetTop(Reticle, Math.Clamp(y, -Reticle.Height / 2.0, GridSvBox.ActualHeight - Reticle.Height / 2.0));
+                // Defensive guard against layout cycle interruptions
             }
-
-            // 5. Update Hue Slider Indicator Position
-            if (updateHueThumb && GridHueBar.ActualWidth > 0)
-            {
-                double thumbX = (_hue / 360.0) * (GridHueBar.ActualWidth - HueThumb.Width);
-                Canvas.SetLeft(HueThumb, Math.Clamp(thumbX, 0, GridHueBar.ActualWidth - HueThumb.Width));
-            }
-
-            // 6. Broadcast Real-time Live Preview to physical keyboard hardware!
-            ColorPreviewChanged?.Invoke(r, g, b);
         }
 
         private static (byte R, byte G, byte B) HsvToRgb(double h, double s, double v)

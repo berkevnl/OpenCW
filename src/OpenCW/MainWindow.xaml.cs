@@ -26,7 +26,6 @@ namespace OpenCW
         private readonly bool _isSimulated;
         private readonly ConfigManager _config;
         private readonly HardwareMonitorService _monitor;
-        private readonly RainbowAnimationService _rainbowService;
 
         private PowerMode _currentPowerMode;
         private LedMode _currentLedMode;
@@ -45,7 +44,6 @@ namespace OpenCW
             _isSimulated = isSimulated;
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
-            _rainbowService = new RainbowAnimationService(_bridge);
 
             InitializeComponent();
 
@@ -218,7 +216,6 @@ namespace OpenCW
 
         protected override void OnClosed(EventArgs e)
         {
-            _rainbowService?.Dispose();
             base.OnClosed(e);
         }
 
@@ -400,12 +397,6 @@ namespace OpenCW
 
             _brightness = val;
             UpdateBrightnessUI();
-
-            if (_currentLedMode == LedMode.Rainbow)
-            {
-                _rainbowService.UpdateBrightness(_brightness);
-            }
-
             ApplyLedSettings();
         }
 
@@ -433,6 +424,21 @@ namespace OpenCW
             {
                 // İptal edilirse orijinal renge geri dön
                 ApplyLedSettings();
+            }
+        }
+
+        private void ColorPreset_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string hex)
+            {
+                string cleanHex = hex.TrimStart('#');
+                if (cleanHex.Length == 6 &&
+                    byte.TryParse(cleanHex[..2], NumberStyles.HexNumber, null, out byte r) &&
+                    byte.TryParse(cleanHex[2..4], NumberStyles.HexNumber, null, out byte g) &&
+                    byte.TryParse(cleanHex[4..6], NumberStyles.HexNumber, null, out byte b))
+                {
+                    SetRgbColor(r, g, b);
+                }
             }
         }
 
@@ -464,16 +470,10 @@ namespace OpenCW
 
             if (_brightness == 0)
             {
-                _rainbowService.Stop();
                 _bridge.TurnOffAllLights();
-            }
-            else if (_currentLedMode == LedMode.Rainbow)
-            {
-                _rainbowService.Start(_brightness);
             }
             else
             {
-                _rainbowService.Stop();
                 // Hardware EC brightness levels:
                 // Level 1 => 50% Brightness
                 // Level 2 => 100% Brightness
@@ -575,6 +575,8 @@ namespace OpenCW
             if (BtnLedRainbow != null) BtnLedRainbow.Content = LocalizationManager.LedRainbow;
 
             if (BtnCustomColor != null) BtnCustomColor.Content = LocalizationManager.CustomColorButton;
+            if (TxtCustomColorTitle != null) TxtCustomColorTitle.Text = LocalizationManager.CustomColorTitle;
+            if (TxtPresetsTitle != null) TxtPresetsTitle.Text = LocalizationManager.PresetsTitle;
 
             if (ChkAutoStart != null) ChkAutoStart.Content = LocalizationManager.AutoStart;
             if (BtnCheckUpdates != null) BtnCheckUpdates.Content = LocalizationManager.CheckUpdates;

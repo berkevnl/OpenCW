@@ -251,8 +251,7 @@
                 <!-- HEX Box -->
                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
                     <TextBlock Text="HEX" FontSize="9" FontWeight="SemiBold" Foreground="#94A3B8" Margin="0,0,0,2"/>
-                    <TextBox x:Name="TxtHexInput" Style="{StaticResource NumericTextBoxStyle}" Height="24" Text="#00B4FF" MaxLength="7"
-                             TextChanged="TxtHexInput_TextChanged"/>
+                    <TextBox x:Name="TxtHexInput" Style="{StaticResource NumericTextBoxStyle}" Height="24" MaxLength="7"/>
                 </StackPanel>
 
                 <!-- RGB Inputs (R, G, B side-by-side) -->
@@ -267,20 +266,17 @@
 
                     <StackPanel Grid.Column="0">
                         <TextBlock Text="R" FontSize="9" FontWeight="SemiBold" Foreground="#EF4444" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                        <TextBox x:Name="TxtRInput" Style="{StaticResource NumericTextBoxStyle}" Height="24" Text="0" MaxLength="3"
-                                 TextChanged="TxtRgbInput_TextChanged"/>
+                        <TextBox x:Name="TxtRInput" Style="{StaticResource NumericTextBoxStyle}" Height="24" MaxLength="3"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="G" FontSize="9" FontWeight="SemiBold" Foreground="#22C55E" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                        <TextBox x:Name="TxtGInput" Style="{StaticResource NumericTextBoxStyle}" Height="24" Text="180" MaxLength="3"
-                                 TextChanged="TxtRgbInput_TextChanged"/>
+                        <TextBox x:Name="TxtGInput" Style="{StaticResource NumericTextBoxStyle}" Height="24" MaxLength="3"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="4">
                         <TextBlock Text="B" FontSize="9" FontWeight="SemiBold" Foreground="#38BDF8" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                        <TextBox x:Name="TxtBInput" Style="{StaticResource NumericTextBoxStyle}" Height="24" Text="255" MaxLength="3"
-                                 TextChanged="TxtRgbInput_TextChanged"/>
+                        <TextBox x:Name="TxtBInput" Style="{StaticResource NumericTextBoxStyle}" Height="24" MaxLength="3"/>
                     </StackPanel>
                 </Grid>
             </Grid>

@@ -286,8 +286,8 @@ namespace OpenCW.Hardware.Casper
                 return TurnOffAllLights();
             }
 
-            // Prime the EC controller PWM if switching into breathing or dynamic modes
-            if (mode == LedMode.Breathing || mode == LedMode.ColorfulCycle)
+            // Prime the EC controller PWM if switching into breathing, dynamic, or rainbow modes
+            if (mode == LedMode.Breathing || mode == LedMode.ColorfulCycle || mode == LedMode.Rainbow)
             {
                 SetLed(LedZone.All, LedMode.Static, brightness, r, g, b);
                 SetLed(LedZone.AllKeyboard, LedMode.Static, brightness, r, g, b);
