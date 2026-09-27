@@ -506,11 +506,11 @@ namespace OpenCW
             }
             else
             {
-                // Excalibur EC PWM donanım kademeleri:
-                // Kademe 1 => Seviye 2 (%50 PWM)
-                // Kademe 2 => Seviye 4 (%100 PWM)
-                byte ecBrightness = _brightness == 1 ? (byte)2 : (byte)4;
-                _bridge.SetAllKeyboardLed(_currentLedMode, ecBrightness, _red, _green, _blue);
+                // Hardware EC brightness levels:
+                // Level 0 => Off (0%)
+                // Level 1 => 50% Brightness
+                // Level 2 => 100% Brightness
+                _bridge.SetAllKeyboardLed(_currentLedMode, _brightness, _red, _green, _blue);
             }
 
             _config.CurrentSettings.LedMode = _currentLedMode;
