@@ -11,19 +11,20 @@ namespace OpenCW.Services
 
         public static string GetPowerModeTitle(PowerMode mode) => (IsTurkish, mode) switch
         {
-            (true, PowerMode.Office) => "Performans Modu: Sessiz",
+            (true, PowerMode.Office) => "Performans Modu: Tasarruf",
             (true, PowerMode.Gaming) => "Performans Modu: Dengeli",
-            (true, PowerMode.HighPerformance) => "Performans Modu: Turbo",
-            (false, PowerMode.Office) => "Performance Mode: Silent",
+            (true, PowerMode.HighPerformance) => "Performans Modu: Performans",
+            (false, PowerMode.Office) => "Performance Mode: Eco",
             (false, PowerMode.Gaming) => "Performance Mode: Balanced",
-            (false, PowerMode.HighPerformance) => "Performance Mode: Turbo",
+            (false, PowerMode.HighPerformance) => "Performance Mode: Performance",
             (true, _) => "Performans Modu",
             (false, _) => "Performance Mode"
         };
 
-        public static string PowerOffice => IsTurkish ? "Sessiz" : "Silent";
+        public static string PowerOffice => IsTurkish ? "Tasarruf" : "Eco";
         public static string PowerGaming => IsTurkish ? "Dengeli" : "Balanced";
-        public static string PowerTurbo => "Turbo";
+        public static string PowerTurbo => IsTurkish ? "Performans" : "Performance";
+        public static string PowerHighPerformance => PowerTurbo;
 
         public static string GpuHeader => IsTurkish ? "GPU Modu: Ayrık / Hibrit" : "GPU Mode: Discrete / Hybrid";
         public static string SystemResourcesHeader => IsTurkish ? "Sistem Kaynakları" : "System Resources";

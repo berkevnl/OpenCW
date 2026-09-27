@@ -71,9 +71,9 @@ OpenCW, temiz yazılım mimarisi ilkelerine göre katmanlara ayrılmıştır:
 ## 🎯 Özellikler
 
 ### 1. Performans Modları
-* **Sessiz (Silent / Office):** Düşük fan devri, sessiz çalışma ortamı ve güç tasarrufu.
+* **Tasarruf (Eco / Office):** Düşük fan devri, sessiz çalışma ortamı ve güç tasarrufu.
 * **Dengeli (Balanced / Gaming):** Dinamik fan eğrisi ve dengeli termal yönetim.
-* **Turbo (Turbo / High Performance):** Maksimum fan devri ve en yüksek donanım gücü.
+* **Performans (Performance / Turbo):** Maksimum fan devri ve en yüksek donanım gücü.
 * *Windows yerel güç planlarıyla (`PowerSetActiveScheme`) otomatik senkronize çalışır.*
 
 ### 2. Canlı Donanım Telemetrisi

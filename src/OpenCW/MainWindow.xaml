@@ -233,7 +233,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- 3 G-Helper Tiles: Sessiz, Dengeli, Turbo -->
+                    <!-- 3 G-Helper Tiles: Tasarruf, Dengeli, Performans -->
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -243,11 +243,11 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Sessiz Button (Bicycle as in G-Helper) -->
+                        <!-- Tasarruf Button (Bicycle as in G-Helper) -->
                         <Button x:Name="BtnModeOffice" Grid.Column="0" Style="{StaticResource GHelperTileStyle}" Click="BtnModeOffice_Click">
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock Text="🚲" FontSize="18" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                                <TextBlock x:Name="TxtModeOfficeLabel" Text="Sessiz" FontSize="12" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="TxtModeOfficeLabel" Text="Tasarruf" FontSize="12" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
@@ -259,11 +259,11 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Turbo (Performans) Button (Rocket as in G-Helper) -->
+                        <!-- Performans Button (Rocket as in G-Helper) -->
                         <Button x:Name="BtnModeHighPerf" Grid.Column="4" Style="{StaticResource GHelperTileStyle}" Click="BtnModeHighPerf_Click">
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock Text="🚀" FontSize="18" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
-                                <TextBlock x:Name="TxtModeHighPerfLabel" Text="Turbo" FontSize="12" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="TxtModeHighPerfLabel" Text="Performans" FontSize="12" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </Grid>

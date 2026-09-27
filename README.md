@@ -71,9 +71,9 @@ OpenCW uses a decoupled, modular design patterned after clean software engineeri
 ## 🎯 Features
 
 ### 1. Performance Profiles
-* **Silent (Office):** Low fan RPM, quiet operation, and energy efficiency.
+* **Eco (Office):** Low fan RPM, quiet operation, and energy efficiency.
 * **Balanced (Gaming):** Dynamic fan curves and balanced thermals for everyday gaming.
-* **Turbo (High Performance):** Maximum fan airflow, maximum thermal headroom, and peak sustained clock speeds.
+* **Performance (Turbo):** Maximum fan airflow, maximum thermal headroom, and peak sustained clock speeds.
 * *Integrated with Windows native power plans (`PowerSetActiveScheme`).*
 
 ### 2. Real-Time Telemetry
