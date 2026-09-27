@@ -99,7 +99,10 @@ if (-not $SkipSign) {
 }
 
 # Generate Release ZIP for Standalone
-$zipPath = "$StandaloneDir\OpenCW-v1.2.0-win-x64.zip"
+[xml]$projXml = Get-Content $ProjectPath
+$appVersion = ($projXml.Project.PropertyGroup | Where-Object { $_.Version }).Version
+if (-not $appVersion) { $appVersion = "1.2.1" }
+$zipPath = "$StandaloneDir\OpenCW-v$appVersion-win-x64.zip"
 Write-Host "==> Creating Standalone Release ZIP: $zipPath" -ForegroundColor Cyan
 if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
 Compress-Archive -Path $StandaloneExe -DestinationPath $zipPath -Force
