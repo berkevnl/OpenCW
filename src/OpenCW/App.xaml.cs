@@ -106,7 +106,9 @@ namespace OpenCW
                     {
                         if (t.IsAvailable)
                         {
-                            _trayManager.UpdateTooltip($"CPU: {t.CpuTemperature}°C Fan: {t.CpuFanRpm}RPM\nGPU: {t.GpuTemperature}°C Fan: {t.GpuFanRpm}RPM");
+                            string cpuStr = t.CpuTemperature > 0 ? $"{t.CpuTemperature}°C" : "--°C";
+                            string gpuStr = t.GpuTemperature > 0 ? $"{t.GpuTemperature}°C" : "--°C";
+                            _trayManager.UpdateTooltip($"CPU: {cpuStr} Fan: {t.CpuFanRpm}RPM\nGPU: {gpuStr} Fan: {t.GpuFanRpm}RPM");
                         }
                         else
                         {

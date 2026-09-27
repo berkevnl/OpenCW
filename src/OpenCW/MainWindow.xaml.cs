@@ -163,8 +163,8 @@ namespace OpenCW
                 return;
             }
 
-            TxtCpuTemp.Text = $"{t.CpuTemperature}°C";
-            TxtGpuTemp.Text = $"{t.GpuTemperature}°C";
+            TxtCpuTemp.Text = t.CpuTemperature > 0 ? $"{t.CpuTemperature}°C" : "--°C";
+            TxtGpuTemp.Text = t.GpuTemperature > 0 ? $"{t.GpuTemperature}°C" : "--°C";
 
             TxtCpuRpm.Text = $"{t.CpuFanRpm}RPM";
             TxtGpuRpm.Text = $"{t.GpuFanRpm}RPM";

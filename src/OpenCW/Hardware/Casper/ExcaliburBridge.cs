@@ -167,21 +167,32 @@ namespace OpenCW.Hardware.Casper
                 gpuRpm = (ushort)(smi.a5 & 0xFFFF);
             }
 
-            // Fallback for CPU temperature if 0
-            if (cpuTemp == 0)
+            // Fallback for CPU temperature if 0 or outside realistic thermal range
+            if (cpuTemp is < 15 or > 115)
             {
-                cpuTemp = GetThermalZoneTemperature();
+                byte fallbackCpu = GetThermalZoneTemperature();
+                if (fallbackCpu > 0) cpuTemp = fallbackCpu;
             }
 
-            // Fallback for GPU temperature & fan if 0
-            if (gpuTemp == 0)
+            // GPU Temperature & Fan Metrics:
+            // Dedicated NVIDIA GPUs report authoritative, real-time die temperatures via NVML.
+            // On Casper Excalibur hardware, the EC register (smi.a3) is typically uncalibrated or
+            // hardcoded to a static 30°C (0x1E) dummy value because the GPU die is not wired to the EC ADC.
+            var nvGpu = NvmlHelper.GetGpuMetrics();
+            if (nvGpu.Temp > 0)
             {
-                var nvGpu = NvmlHelper.GetGpuMetrics();
                 gpuTemp = (byte)nvGpu.Temp;
-                if (gpuRpm == 0 && nvGpu.FanPercent > 0)
-                {
-                    gpuRpm = (ushort)(nvGpu.FanPercent * 45); 
-                }
+            }
+            else if (gpuTemp == 30)
+            {
+                // If NVML returned 0 (e.g. GPU is asleep in D3Cold) and EC returned the known 30°C dummy value,
+                // clear it to 0 so the UI displays "--°C" instead of a false static 30°C.
+                gpuTemp = 0;
+            }
+
+            if (gpuRpm == 0 && nvGpu.FanPercent > 0)
+            {
+                gpuRpm = (ushort)(nvGpu.FanPercent * 45); 
             }
 
             if (smiSuccess || cpuTemp > 0 || gpuTemp > 0 || cpuRpm > 0 || gpuRpm > 0)
