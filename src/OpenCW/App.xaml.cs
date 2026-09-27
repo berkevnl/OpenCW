@@ -106,7 +106,9 @@ namespace OpenCW
                     {
                         if (t.IsAvailable)
                         {
-                            _trayManager.UpdateTooltip($"CPU: {t.CpuTemperature}°C Fan: {t.CpuFanRpm}RPM\nGPU: {t.GpuTemperature}°C Fan: {t.GpuFanRpm}RPM");
+                            string cpuStr = t.CpuTemperature > 0 ? $"{t.CpuTemperature}°C" : "--°C";
+                            string gpuStr = t.GpuTemperature > 0 ? $"{t.GpuTemperature}°C" : "--°C";
+                            _trayManager.UpdateTooltip($"CPU: {cpuStr} Fan: {t.CpuFanRpm}RPM\nGPU: {gpuStr} Fan: {t.GpuFanRpm}RPM");
                         }
                         else
                         {
@@ -176,6 +178,20 @@ namespace OpenCW
                 if (!startMinimized)
                 {
                     _mainWindow.ToggleFlyout();
+                }
+                else
+                {
+                    // If started via Windows logon, refresh tray icon after a brief delay
+                    // in case Windows Explorer was still finishing taskbar notification area registration
+                    System.Threading.Tasks.Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await System.Threading.Tasks.Task.Delay(2500);
+                            _trayManager?.EnsureVisible();
+                        }
+                        catch { }
+                    });
                 }
 
                 // Initial working set trim to drop memory to ultra-lightweight levels (~2-5 MB)

@@ -45,12 +45,25 @@ namespace OpenCW.Services
 
                 if (enable)
                 {
-                    // 1. Create or update Windows Task Scheduler task with highest privileges
-                    // This allows OpenCW (which requires Administrator for ACPI WMI SMI access)
-                    // to launch on Windows logon silently without triggering a UAC prompt.
-                    string taskArgs = $"/create /tn \"{TaskName}\" /tr \"\\\"{exePath}\\\" --autostart\" /sc onlogon /rl highest /f";
-                    int taskResult = RunHiddenProcess("schtasks.exe", taskArgs);
-                    Debug.WriteLine($"[StartupManager] schtasks create exit code: {taskResult}");
+                    string workDir = Path.GetDirectoryName(exePath) ?? AppContext.BaseDirectory;
+
+                    // 1. Create or update Windows Task Scheduler task with highest privileges.
+                    // Designed specifically for gaming laptops:
+                    // - DisallowStartIfOnBatteries = false (Runs reliably even on battery power)
+                    // - StopIfGoingOnBatteries = false (Does not kill process when unplugging AC adapter)
+                    // - Delay = PT3S (3-second delay after logon so Windows Explorer & notification tray are ready)
+                    // - WorkingDirectory = application directory (preserves native DLL and asset resolution)
+                    // - ExecutionTimeLimit = PT0S (infinite, never terminates after 72 hours)
+                    bool taskCreated = CreateTaskViaXml(exePath, workDir);
+                    if (!taskCreated)
+                    {
+                        // Fallback to schtasks command line if XML creation fails
+                        string taskArgs = $"/create /tn \"{TaskName}\" /tr \"\\\"{exePath}\\\" --autostart\" /sc onlogon /rl highest /f";
+                        RunHiddenProcess("schtasks.exe", taskArgs);
+                    }
+
+                    // Enforce battery & execution limits via Schedule.Service COM API as extra assurance
+                    ConfigureTaskBatterySettings();
 
                     // 2. Also register in HKCU Run for compatibility / visibility in Task Manager Startup tab
                     try
@@ -102,13 +115,110 @@ namespace OpenCW.Services
                 }
                 else if (userWantsStartup && isEnabled)
                 {
-                    // Refresh task action in case executable path changed or updated
+                    // Refresh task action in case executable path changed, updated, or needs battery settings applied
                     SetStartup(true);
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[StartupManager] EnsureStartupSynchronized failed: {ex.Message}");
+            }
+        }
+
+        private static bool CreateTaskViaXml(string exePath, string workDir)
+        {
+            string tempXml = Path.Combine(Path.GetTempPath(), $"opencw_task_{Guid.NewGuid():N}.xml");
+            try
+            {
+                string xmlContent = $@"<?xml version=""1.0"" encoding=""UTF-16""?>
+<Task version=""1.2"" xmlns=""http://schemas.microsoft.com/windows/2004/02/mit/task"">
+  <RegistrationInfo>
+    <Author>OpenCW</Author>
+    <Description>OpenCW Universal Hardware Controller Startup Task</Description>
+    <URI>\{TaskName}</URI>
+  </RegistrationInfo>
+  <Triggers>
+    <LogonTrigger>
+      <Enabled>true</Enabled>
+      <Delay>PT3S</Delay>
+    </LogonTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id=""Author"">
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <IdleSettings>
+      <StopOnIdleEnd>false</StopOnIdleEnd>
+      <RestartOnIdle>false</RestartOnIdle>
+    </IdleSettings>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <Priority>7</Priority>
+  </Settings>
+  <Actions Context=""Author"">
+    <Exec>
+      <Command>{exePath}</Command>
+      <Arguments>--autostart</Arguments>
+      <WorkingDirectory>{workDir}</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>";
+
+                File.WriteAllText(tempXml, xmlContent, System.Text.Encoding.Unicode);
+                int exitCode = RunHiddenProcess("schtasks.exe", $"/create /tn \"{TaskName}\" /xml \"{tempXml}\" /f");
+                return exitCode == 0;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[StartupManager] CreateTaskViaXml failed: {ex.Message}");
+                return false;
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(tempXml))
+                    {
+                        File.Delete(tempXml);
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void ConfigureTaskBatterySettings()
+        {
+            try
+            {
+                Type? serviceType = Type.GetTypeFromProgID("Schedule.Service");
+                if (serviceType == null) return;
+
+                dynamic service = Activator.CreateInstance(serviceType)!;
+                service.Connect();
+                dynamic folder = service.GetFolder(@"\");
+                dynamic task = folder.GetTask(TaskName);
+                dynamic def = task.Definition;
+                def.Settings.DisallowStartIfOnBatteries = false;
+                def.Settings.StopIfGoingOnBatteries = false;
+                def.Settings.ExecutionTimeLimit = "PT0S";
+                folder.RegisterTaskDefinition(TaskName, def, 6 /* TASK_CREATE_OR_UPDATE */, null, null, 3 /* TASK_LOGON_INTERACTIVE_TOKEN */);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[StartupManager] ConfigureTaskBatterySettings: {ex.Message}");
             }
         }
 

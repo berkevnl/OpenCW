@@ -19,23 +19,32 @@ namespace OpenCW.Hardware.Common
 
         private static bool _initialized;
         private static IntPtr _deviceHandle = IntPtr.Zero;
-        private static bool _nvmlUnavailable;
+        private static bool _dllMissing;
+        private static int _initRetryCount;
 
         public static (uint Temp, uint FanPercent) GetGpuMetrics()
         {
-            if (_nvmlUnavailable) return (0, 0);
+            if (_dllMissing) return (0, 0);
 
             try
             {
                 if (!_initialized)
                 {
-                    if (nvmlInit() == 0 && nvmlDeviceGetHandleByIndex(0, out _deviceHandle) == 0)
+                    // Allow retry on subsequent polls without overwhelming if persistently failing
+                    if (_initRetryCount > 10 && (_initRetryCount % 5 != 0))
+                    {
+                        _initRetryCount++;
+                        return (0, 0);
+                    }
+
+                    if (nvmlInit() == 0 && nvmlDeviceGetHandleByIndex(0, out _deviceHandle) == 0 && _deviceHandle != IntPtr.Zero)
                     {
                         _initialized = true;
+                        _initRetryCount = 0;
                     }
                     else
                     {
-                        _nvmlUnavailable = true;
+                        _initRetryCount++;
                         return (0, 0);
                     }
                 }
@@ -45,8 +54,17 @@ namespace OpenCW.Hardware.Common
                     uint temp = 0;
                     uint fan = 0;
 
-                    if (nvmlDeviceGetTemperature(_deviceHandle, 0, out uint t) == 0)
+                    int tempRes = nvmlDeviceGetTemperature(_deviceHandle, 0, out uint t);
+                    if (tempRes == 0)
+                    {
                         temp = t;
+                    }
+                    else if (tempRes is 15 or 999) // NVML_ERROR_GPU_IS_LOST / GPU asleep
+                    {
+                        // Reset handle so it re-acquires once GPU wakes up from D3Cold
+                        _initialized = false;
+                        _deviceHandle = IntPtr.Zero;
+                    }
 
                     if (nvmlDeviceGetFanSpeed(_deviceHandle, out uint f) == 0)
                         fan = f;
@@ -54,9 +72,18 @@ namespace OpenCW.Hardware.Common
                     return (temp, fan);
                 }
             }
+            catch (DllNotFoundException)
+            {
+                _dllMissing = true;
+            }
+            catch (EntryPointNotFoundException)
+            {
+                _dllMissing = true;
+            }
             catch
             {
-                _nvmlUnavailable = true;
+                _initialized = false;
+                _deviceHandle = IntPtr.Zero;
             }
             return (0, 0);
         }
