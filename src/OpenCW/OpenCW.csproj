@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <AssemblyName>OpenCW</AssemblyName>
+    <AssemblyTitle>OpenCW</AssemblyTitle>
+    <Product>OpenCW (OpenControlware)</Product>
+    <Company>OpenCW Open Source Community</Company>
+    <Authors>berkevnl</Authors>
+    <Copyright>Copyright © 2026 OpenCW</Copyright>
+    <NeutralLanguage>tr-TR</NeutralLanguage>
+    <RepositoryUrl>https://github.com/berkevnl/OpenCW</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/berkevnl/OpenCW</PackageProjectUrl>
+    <Description>Lightweight and universal open-source hardware control tool for gaming laptops</Description>
+    <Version>1.2.0</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+
+    <!-- Single-File Portable Publish Settings -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+
+    <!-- Extreme Memory & Footprint Optimization (G-Helper profile) -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <RetainVMGarbageCollection>false</RetainVMGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\tray.ico" />
+    <Resource Include="Assets\logo.png" />
+    <Resource Include="Assets\tray.png" />
+    <EmbeddedResource Include="Assets\app.ico" />
+    <EmbeddedResource Include="Assets\tray.ico" />
+    <EmbeddedResource Include="Assets\logo.png" />
+    <EmbeddedResource Include="Assets\tray.png" />
+  </ItemGroup>
+
+</Project>

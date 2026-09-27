@@ -1,5 +1,5 @@
 # Private analysis and requirements documents
-E-Helper_Isterler.md
+OpenCW_Isterler.md
 excalibur_hardware_control_analysis.md
 
 # Build and IDE artifacts
@@ -30,3 +30,9 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
+
+# Local Screenshot Automation Tools & Captured UI Images
+scripts/capture-ui.*
+scripts/SnapshotRunner/
+docs/screenshots/current-ui-*.png
+docs/screenshots/opencw-*.png

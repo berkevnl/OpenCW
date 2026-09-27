@@ -1,108 +1,147 @@
 <p align="center">
-  <img src="docs/screenshots/e-helper-preview.jpg" alt="E-Helper — Casper Excalibur Dizüstü Bilgisayarlar İçin Hafif Kontrol Aracı" width="100%">
+  <img src="docs/ocwcover.png" alt="OpenCW — Dizüstü Bilgisayarlar İçin Hafif Kontrol Merkezi" width="100%">
 </p>
 
-# E-Helper — Casper Excalibur Dizüstü Bilgisayarlar İçin Hafif Kontrol Aracı
+# OpenCW (Open Controlware) — Oyuncu Laptopları İçin Açık Kaynaklı Kontrol Merkezi
 
 <p align="center">
-  <a href="https://github.com/berkevnl/e-helper/releases"><img src="https://img.shields.io/badge/Sürüm-v1.1.0-0078D4?style=flat-square" alt="Sürüm v1.1.0"></a>
-  <a href="https://github.com/berkevnl/e-helper/releases/latest/download/EHelper.exe"><img src="https://img.shields.io/badge/İndir-E--Helper.exe-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Doğrudan İndir"></a>
-  <a href="https://github.com/berkevnl/e-helper/blob/main/LICENSE"><img src="https://img.shields.io/badge/Lisans-GPL--3.0-green.svg?style=flat-square" alt="Lisans"></a>
-  <a href="#-bellek-ram-ve-sistem-kullanımı"><img src="https://img.shields.io/badge/RAM-5--10_MB-success?style=flat-square" alt="RAM Tüketimi"></a>
+  <a href="https://github.com/berkevnl/OpenCW/releases"><img src="https://img.shields.io/badge/Sürüm-v1.2.0-0078D4?style=flat-square" alt="Sürüm v1.2.0"></a>
+  <a href="https://github.com/berkevnl/OpenCW/releases/latest/download/OpenCW.exe"><img src="https://img.shields.io/badge/İndir-OpenCW.exe-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Doğrudan İndir"></a>
+  <a href="https://github.com/berkevnl/OpenCW/blob/main/LICENSE"><img src="https://img.shields.io/badge/Lisans-GPL--3.0-green.svg?style=flat-square" alt="Lisans"></a>
+  <a href="#-neden-opencw-temel-avantajlar"><img src="https://img.shields.io/badge/RAM-5--10_MB-success?style=flat-square" alt="RAM Tüketimi"></a>
   <a href="README.md"><img src="https://img.shields.io/badge/Language-English-blue?style=flat-square" alt="English Documentation"></a>
 </p>
 
 ---
 
-Casper Excalibur oyuncu dizüstü bilgisayarları için resmi **Excalibur Control Center** yazılımının yüksek kaynak tüketen ve kararsız yapısına alternatif olarak geliştirilmiş açık kaynaklı, ultra hafif ve taşınabilir kontrol aracıdır.
+**OpenCW (Open Controlware)**, oyuncu dizüstü bilgisayarları için üreticilerin resmi yüksek kaynak tüketen, kararsız ve şişkin kontrol yazılımlarına (Control Center) alternatif olarak geliştirilmiş açık kaynaklı, ultra hafif ve modüler bir donanım yönetim aracıdır.
 
-**Excalibur G770, G780, G850, G870, G900, G911, G920** ve Quanta ODM tabanlı tüm Casper Excalibur modelleriyle uyumludur.
+ASUS ekosisteminde devrim yaratan **G-Helper** felsefesi temel alınarak tasarlanan OpenCW, çoklu marka mimarisine sahiptir: Kullanıcı tek bir taşınabilir `.exe` dosyasını çalıştırdığında uygulama bilgisayarın marka ve modelini otomatik tespit eder, ilgili donanım köprüsünü (ACPI/EC/SMI) bağlar ve markadan bağımsız standart, akıcı bir yönetim paneli sunar.
 
 <p align="center">
-  <a href="https://github.com/berkevnl/e-helper/releases/latest/download/EHelper.exe">
-    <img src="https://img.shields.io/badge/GÜNCEL_SÜRÜMÜ_İNDİR-E--Helper.exe-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="E-Helper İndir" height="46">
+  <a href="https://github.com/berkevnl/OpenCW/releases/latest/download/OpenCW.exe">
+    <img src="https://img.shields.io/badge/GÜNCEL_SÜRÜMÜ_İNDİR-OpenCW.exe-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="OpenCW İndir" height="46">
   </a>
   <br>
-  <sub><i>Doğrudan indirme butonu başlamazsa lütfen <a href="https://github.com/berkevnl/e-helper/releases/latest">Releases (Sürümler)</a> sayfasından son sürümü edinin.</i></sub>
+  <sub><i>Doğrudan indirme butonu başlamazsa lütfen <a href="https://github.com/berkevnl/OpenCW/releases/latest">Releases (Sürümler)</a> sayfasından son sürümü edinin.</i></sub>
 </p>
 
 ---
 
-## ⚡ Neden E-Helper? (Temel Avantajlar)
+## ⚡ Neden OpenCW? (Temel Avantajlar)
 
-1. **Ultra Düşük Bellek Tüketimi:** Arka planda sistem tepsisinde çalışırken yalnızca **~5 - 10 MB RAM** harcar. Yönetim paneli ekranda açıkken dahi tüketim **~20 - 35 MB** seviyesindedir.
-2. **Kurulumsuz & Sıfır Şişkinlik (Bloat-Free):** Kurulum gerektirmeyen tek bir `.exe` dosyasından ibarettir. Sisteme ek sürücü, servis, telemetri takipçisi veya başlangıç görevleri yüklemez.
-3. **Doğrudan Yerel Donanım Köprüsü:** Üçüncü taraf hantal servisler yerine Windows'un yerel WMI ACPI SMI (`RW_GMWMI`) kanalı üzerinden anakart gömülü denetleyicisiyle (EC / BIOS) doğrudan haberleşir.
-4. **Hızlı Sistem Tepsisi Paneli:** Görev çubuğunda pencere kaplamaz, sistem tepsisine yerleşir. Simgeye tıklandığında anında ekranın köşesinde modern panel açılır.
-5. **Donanım ve Uygulama Eş Zamanlılığı:** Donanım durumu ile uygulamanın gerçek zamanlı eş zamanlılığı.
-6. **Entegre Otomatik Güncelleyici:** GitHub Release üzerinden yeni sürümleri tek tıkla sorgulayıp günceller.
-7. **Modern Tasarım:** Karanlık (Dark) ve Aydınlık (Light) tema seçenekleri.
+1. **Çoklu Marka Mimarisi, Tek Executable:** Desteklenen tüm markalar için tek bir taşınabilir `.exe` yeterlidir. Gigabaytlarca indirme veya karmaşık kurulum gerekmez.
+2. **Ultra Düşük Bellek Tüketimi:** Arka planda sistem tepsisinde beklerken yalnızca **~5 - 10 MB RAM** harcar. Yönetim paneli ekranda aktif açıkken dahi tüketim **~20 - 35 MB** civarındadır.
+3. **Sıfır Arka Plan Yükü (Bloat-Free):** Arka planda çalışan servisler (daemons), telemetri takipçileri, analitik ajanları ve CPU'yu meşgul eden gereksiz süreçler yoktur.
+4. **Kalıcı Ayar Korunumu:** Yapılan ayarlar (klavye RGB aydınlatması, fan/güç modu, parlaklık) bilgisayar kapatılıp açıldığında dahi kaybolmaz; Windows Görev Zamanlayıcısı başlangıç entegrasyonu ve açılış sonrası EC firmware senkronizasyonu ile otomatik korunur.
+5. **Doğrudan Donanım Köprüsü:** Üreticilerin hantal yazılımları yerine doğrudan anakart gömülü denetleyicisiyle (EC / WMI ACPI SMI) güvenli ve yerel iletişim kurar.
+6. **Kompakt Sistem Tepsisi Paneli:** Görev çubuğunda yer kaplamaz, bildirim alanındaki simgesine tıklandığında ekranın köşesinde fırlayan modern bir arayüz açılır ve istendiğinde ekranda serbestçe taşınabilir.
+7. **Çift Dil & Çift Tema:** Tek tıkla Türkçe ve İngilizce, ayrıca G-Helper esintili Mat Koyu ve Ferah Açık tema desteği.
+
+---
+
+## 🏗️ Çoklu Marka (Multi-Vendor) Mimarisi
+
+OpenCW, temiz yazılım mimarisi ilkelerine göre katmanlara ayrılmıştır:
+
+```
+                  ┌─────────────────────────────────────────┐
+                  │          OpenCW Ortak Arayüz            │
+                  │   (Flyout / Tray / Tekil Tasarım)       │
+                  └────────────────────┬────────────────────┘
+                                       │
+                      ┌────────────────┴────────────────┐
+                      │    HardwareDetector & Factory   │
+                      │   (WMI / SMBIOS Cihaz Keşfi)    │
+                      └────────────────┬────────────────┘
+                                       │
+            ┌──────────────────────────┼──────────────────────────┐
+            ▼                          ▼                          ▼
+ ┌──────────────────────┐   ┌──────────────────────┐   ┌──────────────────────┐
+ │   Casper Excalibur   │   │  Gelecek Markalar... │   │   Simülasyon Modu    │
+ │  (ACPI WMI SMI EC)   │   │    (Lenovo / HP)     │   │  (Geliştirme & Test) │
+ └──────────────────────┘   └──────────────────────┘   └──────────────────────┘
+```
+
+* **Dinamik Nesne Üretimi (Lazy Loading):** Açılışta yalnızca algılanan üreticiye ait köprü sınıfı belleğe (`RAM`) alınır. Diğer markaların kodları belleğe yüklenmez; bu sayede RAM kullanımı ve açılış süresi daima minimumda kalır.
+* **Ortak Kullanıcı Deneyimi:** Bilgisayarınız bir Excalibur da olsa, gelecekte eklenecek bir model de olsa arayüz standart, pürüzsüz ve tutarlıdır.
 
 ---
 
 ## 🎯 Özellikler
 
 ### 1. Performans Modları
-* **Sessiz (Office / Sessiz):** Düşük fan devri, sessiz çalışma ve güç tasarrufu.
-* **Dengeli (Gaming / Dengeli):** Dengeli soğutma ve akıllı fan devir yönetimi.
-* **Turbo (High Performance / Yüksek Performans):** Tam güç limiti ve maksimum soğutma performansı.
+* **Sessiz (Silent / Office):** Düşük fan devri, sessiz çalışma ortamı ve güç tasarrufu.
+* **Dengeli (Balanced / Gaming):** Dinamik fan eğrisi ve dengeli termal yönetim.
+* **Turbo (Turbo / High Performance):** Maksimum fan devri ve en yüksek donanım gücü.
 * *Windows yerel güç planlarıyla (`PowerSetActiveScheme`) otomatik senkronize çalışır.*
 
-### 2. Canlı Telemetri İzleme
-* **CPU & GPU Değerleri:** Anlık işlemci ve ekran kartı sıcaklıkları (°C) ile fan devir hızları (RPM).
-* **Sistem Kaynakları:** Canlı RAM bellek kullanımı (GB ve yüzde) ile sistem diski SSD (C:) doluluk oranı.
-* **Tepsi İpucu (Tooltip):** Sistem tepsisindeki ikonun üzerine fare getirildiğinde pencereyi açmaya gerek kalmadan anlık sıcaklık ve RPM bilgileri görüntülenir.
+### 2. Canlı Donanım Telemetrisi
+* **CPU & GPU Değerleri:** Anlık işlemci ve ekran kartı sıcaklıkları (°C) ile fan RPM değerleri.
+* **Sistem Kaynakları:** Canlı RAM kullanımı (GB ve yüzde) ve sistem diski SSD (C:) doluluk oranı.
+* **Sistem Tepsisi İpucu (Tooltip):** Fare tepsi simgesinin üzerine getirildiğinde pencereyi açmadan anlık sıcaklık ve RPM bilgileri görüntülenir.
 
 ### 3. RGB Klavye Aydınlatma Denetimi
-* **Modlar:** Sabit (Static), Nefes Alma (Breathing), Gökkuşağı Döngüsü (Dinamik) ve Kapalı (Off).
-* **Canlı Renk Yelpazesi:** İnteraktif spektrum üzerinden akıcı renk seçimi ve hazır popüler renk butonları.
-* **3 Kademeli Donanımsal Parlaklık:** 
-  * `0` : **Kapalı (%0)** — Tüm klavye aydınlatma bölgelerini donanımsal olarak kapatır.
+* **Modlar:** Sabit (Static), Nefes Alma (Breathing), Renk Döngüsü (Dinamik) ve Kapalı (Off).
+* **Canlı Renk Spektrumu:** 360 derecelik renk yelpazesi üzerinden akıcı seçim ve popüler hazır renk butonları.
+* **Donanımsal Parlaklık Kademeleri:**
+  * `0` : **Kapalı (%0)** — Tüm klavye ışıklarını donanımsal olarak kapatır.
   * `1` : **%50 Parlaklık** — Dengeli ortam parlaklığı.
-  * `2` : **%100 Parlaklık** — Maksimum parlaklık seviyesi.
+  * `2` : **%100 Parlaklık** — Tam parlaklık seviyesi.
+* **Yeniden Başlatmada Korunum:** Bilgisayar yeniden başlatıldığında klavye aydınlatma modunuz, parlaklığınız ve renginiz otomatik olarak tekrar uygulanır.
 
-### 4. Kullanılabilirlik ve Özelleştirme
-* **Başlangıçta Çalıştır:** Windows başlangıcında otomatik başlatma seçeneği (sıfır ek yük).
-* **Tema Seçimi:** Koyu Mod ile Açık Mod arasında tek tıkla geçiş.
-* **Hızlı Dil Değişimi:** Tek tıkla **Türkçe (TR)** ve **İngilizce (EN)** arayüz desteği.
+### 4. Kullanılabilirlik & Sistem Entegrasyonu
+* **Başlangıçta Çalıştır:** Windows açılışında UAC uyarısı vermeden arka planda sessizce başlatılan Görev Zamanlayıcısı entegrasyonu.
+* **Tek Tıkla Tema Değişimi:** Mat Koyu ve Ferah Açık tema seçenekleri.
+* **Entegre Güncelleyici:** GitHub üzerinden yeni sürümleri tek tıkla sorgulama.
 
 ---
 
-## 💻 Desteklenen Modeller
+## 💻 Donanım Desteği
 
-Quanta ODM anakart mimarisine ve WMI ACPI SMI arayüzüne sahip Casper Excalibur dizüstü bilgisayarlarla test edilmiş ve tasarlanmıştır:
+OpenCW açılışta cihazınızı dinamik olarak tespit eder:
 
-* **Excalibur G770** (Tüm nesiller: Intel 9., 10., 11., 12. Nesil)
+### ✅ Casper Excalibur Ailesi (Doğrudan ACPI SMI Motoru)
+> Fiziksel donanım üzerinde test edilmiş ve sorunsuz çalıştığı doğrulanmıştır: **Excalibur G770**, **G850** ve **G911** (performans profilleri, telemetri ve klavye RGB aydınlatması).
+
+* **Excalibur G770** (Test Edildi & Doğrulandı)
+* **Excalibur G850 / G860** (Test Edildi & Doğrulandı)
+* **Excalibur G911** (Test Edildi & Doğrulandı)
 * **Excalibur G780**
-* **Excalibur G850 / G860**
-* **Excalibur G870** (Intel 12. ve 13. Nesil)
+* **Excalibur G870**
 * **Excalibur G900**
-* **Excalibur G911**
 * **Excalibur G920**
-* *`root\wmi:RW_GMWMI` arabirimini barındıran diğer Quanta ODM Excalibur modelleri.*
+
+### ⏳ Eklenecek Donanım Köprüleri (Planlanan)
+* **Lenovo Legion Serisi**
+* **HP Omen & Victus Serisi**
+
+*(Topluluk katkılarına açıktır! Diğer dizüstü bilgisayarlar için ACPI/WMI köprüsü geliştirmek veya tersine mühendislik verisi sağlamak isterseniz [Hardware Dizinine](src/OpenCW/Hardware/) göz atabilirsiniz.)*
+
+### 🧪 Simülasyon Modu
+* Desteklenmeyen cihazlarda, harici masaüstü sistemlerde veya sanal makinelerde uygulama otomatik olarak simülasyon moduna geçer; arayüz ve kontroller güvenle incelenebilir.
 
 ---
 
 ## 🚀 İndirme ve Kullanım
 
-1. [Releases (Sürümler)](https://github.com/berkevnl/e-helper/releases/latest) sayfasına gidin.
-2. `EHelper.exe` dosyasını indirin (kurulum gerekmez).
-3. `EHelper.exe` dosyasına sağ tıklayıp **Yönetici Olarak Çalıştır** deyin *(Windows'un ACPI WMI SMI donanım kontrolcüsüne erişebilmesi için yönetici yetkisi şarttır)*.
-4. E-Helper ekranın sağ altındaki **Sistem Tepsisine** (saatin yanına) yerleşecektir. Mavi **E** simgesine tıklayarak paneli açıp kapatabilirsiniz!
+1. [Releases (Sürümler)](https://github.com/berkevnl/OpenCW/releases/latest) sayfasına gidin.
+2. `OpenCW.exe` dosyasını indirin (kurulum gerekmez).
+3. `OpenCW.exe` dosyasına sağ tıklayıp **Yönetici Olarak Çalıştır** deyin *(Windows'un ACPI WMI SMI donanım kontrolcüsüne erişebilmesi için yönetici yetkisi gereklidir)*.
+4. OpenCW ekranın sağ altındaki **Sistem Tepsisine** (saatin yanına) yerleşecektir. Kırmızı OpenCW simgesine tıklayarak paneli açıp kapatabilirsiniz!
 
 ---
 
 ## 💖 Teşekkür & İlham Kaynağı
 
-Bu proje, **[Seerge](https://github.com/seerge)** tarafından geliştirilen öncü **[G-Helper](https://github.com/seerge/g-helper)** projesinden büyük ilham almıştır.
+Bu proje, **[Seerge](https://github.com/seerge)** tarafından geliştirilen öncü **[G-Helper](https://github.com/seerge/g-helper)** projesinden ilham almıştır.
 
-G-Helper, hantal ve kapalı kutu OEM üretici yazılımlarının açık kaynaklı, ultra hafif, şeffaf ve minimalist araçlarla ikame edilebileceğini kanıtlamıştır. E-Helper, bu felsefeyi ve tasarım zarafetini Casper Excalibur topluluğuna kazandırmayı amaçlamaktadır.
+G-Helper, hantal ve kapalı kutu OEM üretici yazılımlarının açık kaynaklı, ultra hafif, şeffaf ve minimalist araçlarla ikame edilebileceğini kanıtlamıştır. **OpenCW**, bu felsefeyi çoklu marka destekli bir yapıyla dizüstü bilgisayar ekosistemine kazandırmayı amaçlamaktadır.
 
 ---
 
-## ⚖️ Marka & Yasal Haklar Bildirimi
+## ⚖️ Yasal Haklar Bildirimi
 
-* **Casper®**, **Excalibur®** ve Casper Excalibur logoları **Casper Bilgisayar Sistemleri A.Ş.** şirketinin tescilli ticari markalarıdır.
-* **E-Helper**, bağımsız ve açık kaynaklı bir topluluk projesidir. Casper Bilgisayar Sistemleri A.Ş. ile herhangi bir resmi bağı, ortaklığı, sponsorluğu veya onayı **bulunmamaktadır**.
-* Dokümanda adı geçen tüm diğer ticari markalar ilgili hak sahiplerinin mülkiyetindedir.
+* Bu projede adı geçen marka ve model isimleri yalnızca donanım uyumluluğunu belirtmek amacıyla kullanılmıştır ve ilgili hak sahiplerinin mülkiyetindedir.
+* **OpenCW**, bağımsız ve açık kaynaklı bir topluluk projesidir.
 * Bu yazılım **GNU General Public License v3.0 (GPL-3.0)** lisansı altında, hiçbir garanti verilmeksizin "olduğu gibi" sunulmaktadır.

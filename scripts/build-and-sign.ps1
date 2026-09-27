@@ -1,14 +1,14 @@
-# E-Helper Build and Sign Script
+# OpenCW (OpenControlware) Build and Sign Script
 # Builds clean, standalone and framework-dependent binaries with full assembly metadata and Authenticode digital signing.
 
 param(
     [switch]$SkipSign = $false,
-    [string]$CertSubject = "CN=E-Helper Open Source Community"
+    [string]$CertSubject = "CN=OpenCW Open Source Community"
 )
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Resolve-Path "$PSScriptRoot\.."
-$ProjectPath = "$ProjectRoot\src\EHelper\EHelper.csproj"
+$ProjectPath = "$ProjectRoot\src\OpenCW\OpenCW.csproj"
 $StandaloneDir = "$ProjectRoot\publish-standalone"
 $FrameworkDir = "$ProjectRoot\publish"
 $CertsDir = "$ProjectRoot\certs"
@@ -30,14 +30,14 @@ if (Test-Path $FrameworkDir) {
     New-Item -ItemType Directory -Force -Path $FrameworkDir | Out-Null
 }
 
-Write-Host "==> [1/3] Building E-Helper Standalone Single-File..." -ForegroundColor Cyan
+Write-Host "==> [1/3] Building OpenCW Standalone Single-File..." -ForegroundColor Cyan
 dotnet publish $ProjectPath -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o $StandaloneDir
 
-Write-Host "==> [2/3] Building E-Helper Framework-Dependent..." -ForegroundColor Cyan
+Write-Host "==> [2/3] Building OpenCW Framework-Dependent..." -ForegroundColor Cyan
 dotnet publish $ProjectPath -c Release -r win-x64 --self-contained false -o $FrameworkDir
 
-$StandaloneExe = "$StandaloneDir\EHelper.exe"
-$FrameworkExe = "$FrameworkDir\EHelper.exe"
+$StandaloneExe = "$StandaloneDir\OpenCW.exe"
+$FrameworkExe = "$FrameworkDir\OpenCW.exe"
 
 if (-not (Test-Path $StandaloneExe)) {
     Write-Error "Build failed: $StandaloneExe does not exist."
@@ -51,7 +51,7 @@ Write-Host "==> Framework-Dependent Size: $([Math]::Round($FrameworkSize, 2)) MB
 
 if (-not $SkipSign) {
     Write-Host "==> [3/3] Authenticode Digital Signing..." -ForegroundColor Cyan
-    $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -match "E-Helper" } | Select-Object -First 1
+    $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -match "OpenCW" } | Select-Object -First 1
 
     if (-not $cert) {
         Write-Host "==> Generating local Code Signing Certificate..." -ForegroundColor Yellow
@@ -64,7 +64,7 @@ if (-not $SkipSign) {
     }
 
     # Export public certificate
-    $publicCertPath = "$CertsDir\EHelper_CodeSigning.cer"
+    $publicCertPath = "$CertsDir\OpenCW_CodeSigning.cer"
     [System.IO.File]::WriteAllBytes($publicCertPath, $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert))
 
     # Add to TrustedPublisher & TrustedPeople (silent, no interactive popup)
@@ -99,7 +99,7 @@ if (-not $SkipSign) {
 }
 
 # Generate Release ZIP for Standalone
-$zipPath = "$StandaloneDir\EHelper-v1.1.0-win-x64.zip"
+$zipPath = "$StandaloneDir\OpenCW-v1.2.0-win-x64.zip"
 Write-Host "==> Creating Standalone Release ZIP: $zipPath" -ForegroundColor Cyan
 if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
 Compress-Archive -Path $StandaloneExe -DestinationPath $zipPath -Force
