@@ -64,14 +64,14 @@ namespace OpenCW
             _blue = s.Blue;
             _isDarkTheme = s.IsDarkTheme;
 
-            if (_currentLedMode != LedMode.Off)
+            if (_currentLedMode == LedMode.Off)
             {
-                _lastActiveLedMode = _currentLedMode;
-                if (_brightness == 0) _brightness = 2;
+                _currentLedMode = LedMode.Static;
+                _brightness = 0;
             }
             else
             {
-                _brightness = 0;
+                _lastActiveLedMode = _currentLedMode;
             }
 
             // Load Language
@@ -90,6 +90,7 @@ namespace OpenCW
 
             SliderBrightness.Value = _brightness;
             UpdateBrightnessUI();
+            UpdateColorPreview();
 
             // Synchronize Windows Startup state (Task Scheduler + Run key)
             StartupManager.EnsureStartupSynchronized(s.StartWithWindows);
@@ -213,11 +214,15 @@ namespace OpenCW
             }
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+        }
+
         protected override void OnDeactivated(EventArgs e)
         {
             base.OnDeactivated(e);
-            Hide();
-            MemoryOptimizer.TrimMemory();
+            // Çarpıya basılmadığı sürece pencerenin kapanmaması için OnDeactivated otomatik gizleme kaldırıldı
         }
 
         private void BtnCloseToTray_Click(object sender, RoutedEventArgs e)
@@ -303,36 +308,26 @@ namespace OpenCW
             SetLedMode(LedMode.ColorfulCycle);
         }
 
-        private void BtnLedOff_Click(object sender, RoutedEventArgs e)
+        private void BtnLedRainbow_Click(object sender, RoutedEventArgs e)
         {
-            SetLedMode(LedMode.Off);
+            // Yazılımsal yumuşak ve canlı Gökkuşağı dalgası (Linear Left-to-Right Rainbow Wave)
+            SetLedMode(LedMode.Rainbow);
         }
 
         private void SetLedMode(LedMode mode)
         {
             _currentLedMode = mode;
-            if (_currentLedMode == LedMode.Off)
+            _lastActiveLedMode = _currentLedMode;
+
+            // Aydınlatma 0 ise kullanıcı mod seçtiğinde otomatik olarak %100 seviyesine (2) aç
+            if (_brightness == 0)
             {
-                _brightness = 0;
-                if (SliderBrightness != null && SliderBrightness.Value != 0)
+                _brightness = 2;
+                if (SliderBrightness != null && SliderBrightness.Value != 2)
                 {
-                    SliderBrightness.Value = 0;
+                    SliderBrightness.Value = 2;
                 }
                 UpdateBrightnessUI();
-            }
-            else
-            {
-                _lastActiveLedMode = _currentLedMode;
-                // If brightness was 0, turn on to 100% (level 2)
-                if (_brightness == 0)
-                {
-                    _brightness = 2;
-                    if (SliderBrightness != null && SliderBrightness.Value != 2)
-                    {
-                        SliderBrightness.Value = 2;
-                    }
-                    UpdateBrightnessUI();
-                }
             }
 
             UpdateLedModeButtonsUI();
@@ -348,11 +343,11 @@ namespace OpenCW
             {
                 BtnLedStatic.Style = _currentLedMode == LedMode.Static ? activeStyle : normalStyle;
                 BtnLedBreathing.Style = _currentLedMode == LedMode.Breathing ? activeStyle : normalStyle;
-                BtnLedDynamic.Style = (_currentLedMode == LedMode.ColorfulCycle || _currentLedMode == LedMode.Rainbow) ? activeStyle : normalStyle;
-                BtnLedOff.Style = _currentLedMode == LedMode.Off ? activeStyle : normalStyle;
+                BtnLedDynamic.Style = _currentLedMode == LedMode.ColorfulCycle ? activeStyle : normalStyle;
+                BtnLedRainbow.Style = _currentLedMode == LedMode.Rainbow ? activeStyle : normalStyle;
             }
 
-            // Palette and preset colors only apply to Static and Breathing modes
+            // Özel renk seçimi yalnızca Sabit ve Nefes modlarında geçerlidir
             if (PnlColorSection != null)
             {
                 bool isManualColor = _currentLedMode == LedMode.Static || _currentLedMode == LedMode.Breathing;
@@ -399,71 +394,73 @@ namespace OpenCW
             if (!_isInitialized || SliderBrightness == null) return;
             byte val = (byte)Math.Clamp(SliderBrightness.Value, 0, 2);
 
-            if (val == 0)
-            {
-                // En sola (0) çekildiğinde: Kapalı moduna alınmış gibi klavye aydınlatmasını kapat
-                if (_currentLedMode != LedMode.Off)
-                {
-                    _lastActiveLedMode = _currentLedMode;
-                }
-                SetLedMode(LedMode.Off);
-                return;
-            }
-
             _brightness = val;
             UpdateBrightnessUI();
-
-            // 1 (%50) veya 2 (%100): Kapalı moddaysa son aktif modu veya Sabit modu açar
-            if (_currentLedMode == LedMode.Off)
-            {
-                _currentLedMode = (_lastActiveLedMode != LedMode.Off) ? _lastActiveLedMode : LedMode.Static;
-                UpdateLedModeButtonsUI();
-            }
-
             ApplyLedSettings();
         }
 
-        private void Spectrum_MouseDown(object sender, MouseButtonEventArgs e)
+        private void BtnCustomColor_Click(object sender, RoutedEventArgs e)
         {
-            e.Handled = true;
-            PickColorFromSpectrum(e.GetPosition(BrdSpectrum));
-        }
-
-        private void Spectrum_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            var picker = new UI.ColorPickerWindow(_red, _green, _blue)
             {
-                e.Handled = true;
-                PickColorFromSpectrum(e.GetPosition(BrdSpectrum));
+                Owner = this
+            };
+
+            // Donanım WMI haberleşmesini arka plan iş parçacığına taşıyıp arayüzün (UI) 0ms kasmadan çalışmasını sağlıyoruz
+            (byte R, byte G, byte B)? pendingColor = null;
+            int isSendingHardware = 0;
+
+            void ScheduleHardwarePreview((byte R, byte G, byte B) rgb)
+            {
+                pendingColor = rgb;
+                if (Interlocked.CompareExchange(ref isSendingHardware, 1, 0) == 0)
+                {
+                    System.Threading.Tasks.Task.Run(async () =>
+                    {
+                        try
+                        {
+                            while (pendingColor.HasValue)
+                            {
+                                var current = pendingColor.Value;
+                                pendingColor = null;
+
+                                if (_brightness > 0 && (_currentLedMode == LedMode.Static || _currentLedMode == LedMode.Breathing))
+                                {
+                                    _bridge.SetAllKeyboardLed(_currentLedMode, _brightness, current.R, current.G, current.B);
+                                }
+
+                                // Donanım veri yolunu (EC SMI) tıkamamak için kısa bekleme
+                                await System.Threading.Tasks.Task.Delay(60);
+                            }
+                        }
+                        catch { }
+                        finally
+                        {
+                            Interlocked.Exchange(ref isSendingHardware, 0);
+                            if (pendingColor.HasValue)
+                            {
+                                ScheduleHardwarePreview(pendingColor.Value);
+                            }
+                        }
+                    });
+                }
             }
-        }
 
-        private void PickColorFromSpectrum(Point pos)
-        {
-            double width = BrdSpectrum.ActualWidth;
-            if (width <= 0) return;
+            // Renk seçicide gezinirken donanımda asenkron gerçek zamanlı canlı önizleme
+            picker.ColorPreviewChanged += (r, g, b) =>
+            {
+                ScheduleHardwarePreview((r, g, b));
+            };
 
-            double fraction = Math.Clamp(pos.X / width, 0.0, 1.0);
-            double hue = fraction * 360.0;
-            var (r, g, b) = HsvToRgb(hue, 1.0, 1.0);
-            SetRgbColor(r, g, b);
-        }
-
-        private static (byte R, byte G, byte B) HsvToRgb(double h, double s, double v)
-        {
-            double c = v * s;
-            double x = c * (1 - Math.Abs((h / 60.0) % 2 - 1));
-            double m = v - c;
-
-            double r = 0, g = 0, b = 0;
-            if (h < 60) { r = c; g = x; b = 0; }
-            else if (h < 120) { r = x; g = c; b = 0; }
-            else if (h < 180) { r = 0; g = c; b = x; }
-            else if (h < 240) { r = 0; g = x; b = 0; }
-            else if (h < 300) { r = x; g = 0; b = c; }
-            else { r = c; g = 0; b = x; }
-
-            return ((byte)((r + m) * 255), (byte)((g + m) * 255), (byte)((b + m) * 255));
+            if (picker.ShowDialog() == true)
+            {
+                SetRgbColor(picker.SelectedRed, picker.SelectedGreen, picker.SelectedBlue);
+            }
+            else
+            {
+                // İptal edilirse orijinal renge geri dön
+                ApplyLedSettings();
+            }
         }
 
         private void ColorPreset_Click(object sender, RoutedEventArgs e)
@@ -493,21 +490,27 @@ namespace OpenCW
 
         private void UpdateColorPreview()
         {
-            // Color preview in slider bar removed as requested
+            if (BrdActiveColorPreview != null)
+            {
+                BrdActiveColorPreview.Background = new SolidColorBrush(Color.FromRgb(_red, _green, _blue));
+            }
+            if (TxtActiveHex != null)
+            {
+                TxtActiveHex.Text = $"#{_red:X2}{_green:X2}{_blue:X2}";
+            }
         }
 
         private void ApplyLedSettings()
         {
             if (!_isInitialized || _bridge == null || _config == null) return;
 
-            if (_currentLedMode == LedMode.Off || _brightness == 0)
+            if (_brightness == 0)
             {
                 _bridge.TurnOffAllLights();
             }
             else
             {
                 // Hardware EC brightness levels:
-                // Level 0 => Off (0%)
                 // Level 1 => 50% Brightness
                 // Level 2 => 100% Brightness
                 _bridge.SetAllKeyboardLed(_currentLedMode, _brightness, _red, _green, _blue);
@@ -605,9 +608,10 @@ namespace OpenCW
             if (BtnLedStatic != null) BtnLedStatic.Content = LocalizationManager.LedStatic;
             if (BtnLedBreathing != null) BtnLedBreathing.Content = LocalizationManager.LedBreathing;
             if (BtnLedDynamic != null) BtnLedDynamic.Content = LocalizationManager.LedDynamic;
-            if (BtnLedOff != null) BtnLedOff.Content = LocalizationManager.LedOff;
+            if (BtnLedRainbow != null) BtnLedRainbow.Content = LocalizationManager.LedRainbow;
 
-            if (TxtSpectrumTitle != null) TxtSpectrumTitle.Text = LocalizationManager.SpectrumTitle;
+            if (BtnCustomColor != null) BtnCustomColor.Content = LocalizationManager.CustomColorButton;
+            if (TxtCustomColorTitle != null) TxtCustomColorTitle.Text = LocalizationManager.CustomColorTitle;
             if (TxtPresetsTitle != null) TxtPresetsTitle.Text = LocalizationManager.PresetsTitle;
 
             if (ChkAutoStart != null) ChkAutoStart.Content = LocalizationManager.AutoStart;

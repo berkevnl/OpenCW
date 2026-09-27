@@ -37,10 +37,11 @@ namespace OpenCW.Services
 
         public static string LedStatic => IsTurkish ? "✨ Sabit" : "✨ Static";
         public static string LedBreathing => IsTurkish ? "💨 Nefes" : "💨 Breathing";
-        public static string LedDynamic => IsTurkish ? "🌈 Dinamik" : "🌈 Dynamic";
-        public static string LedOff => IsTurkish ? "⭕ Kapalı" : "⭕ Off";
+        public static string LedDynamic => IsTurkish ? "💫 Dinamik" : "💫 Dynamic";
+        public static string LedRainbow => IsTurkish ? "🌈 Gökkuşağı" : "🌈 Rainbow";
 
-        public static string SpectrumTitle => IsTurkish ? "Renk Yelpazesi" : "Color Spectrum";
+        public static string CustomColorButton => IsTurkish ? "🎨 Özel Renk Seç" : "🎨 Custom Color";
+        public static string CustomColorTitle => IsTurkish ? "Özel Renk" : "Custom Color";
         public static string PresetsTitle => IsTurkish ? "Hazır Renkler" : "Color Presets";
 
         public static string AutoStart => IsTurkish ? "Başlangıçta Çalıştır" : "Start with Windows";
