@@ -5,7 +5,7 @@
 # OpenCW (Open Controlware) — Oyuncu Laptopları İçin Açık Kaynaklı Kontrol Merkezi
 
 <p align="center">
-  <a href="https://github.com/berkevnl/OpenCW/releases"><img src="https://img.shields.io/badge/Sürüm-v1.2.1-0078D4?style=flat-square" alt="Sürüm v1.2.1"></a>
+  <a href="https://github.com/berkevnl/OpenCW/releases"><img src="https://img.shields.io/badge/Sürüm-v1.2.2-0078D4?style=flat-square" alt="Sürüm v1.2.2"></a>
   <a href="https://github.com/berkevnl/OpenCW/releases/latest/download/OpenCW.exe"><img src="https://img.shields.io/badge/İndir-OpenCW.exe-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Doğrudan İndir"></a>
   <a href="https://github.com/berkevnl/OpenCW/blob/main/LICENSE"><img src="https://img.shields.io/badge/Lisans-GPL--3.0-green.svg?style=flat-square" alt="Lisans"></a>
   <a href="#-neden-opencw-temel-avantajlar"><img src="https://img.shields.io/badge/RAM-5--10_MB-success?style=flat-square" alt="RAM Tüketimi"></a>

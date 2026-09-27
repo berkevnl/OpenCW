@@ -14,7 +14,7 @@ namespace OpenCW.Services
     public static class UpdateService
     {
         private const string GitHubRepo = "berkevnl/OpenCW";
-        public const string CurrentVersion = "1.2.1";
+        public const string CurrentVersion = "1.2.2";
 
         private static readonly HttpClient HttpClient = new();
 

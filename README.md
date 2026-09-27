@@ -5,7 +5,7 @@
 # OpenCW (Open Controlware) — Open-Source Gaming Laptop Control Center
 
 <p align="center">
-  <a href="https://github.com/berkevnl/OpenCW/releases"><img src="https://img.shields.io/badge/Version-v1.2.1-0078D4?style=flat-square" alt="Version v1.2.1"></a>
+  <a href="https://github.com/berkevnl/OpenCW/releases"><img src="https://img.shields.io/badge/Version-v1.2.2-0078D4?style=flat-square" alt="Version v1.2.2"></a>
   <a href="https://github.com/berkevnl/OpenCW/releases/latest/download/OpenCW.exe"><img src="https://img.shields.io/badge/Download-OpenCW.exe-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Direct Download"></a>
   <a href="https://github.com/berkevnl/OpenCW/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-green.svg?style=flat-square" alt="License"></a>
   <a href="#-why-opencw-advantages"><img src="https://img.shields.io/badge/RAM-5--10_MB-success?style=flat-square" alt="RAM Usage"></a>
