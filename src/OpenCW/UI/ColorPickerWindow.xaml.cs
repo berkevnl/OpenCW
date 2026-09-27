@@ -254,6 +254,10 @@ namespace OpenCW.UI
 
         #region Core HSV & Geometry Calculations
 
+        private double _lastRenderedHue = -1;
+        private byte _lastReportedR = 255, _lastReportedG = 255, _lastReportedB = 255;
+        private readonly SolidColorBrush _newColorBrush = new SolidColorBrush();
+
         private void UpdateFromHsv(bool updateInputs, bool updateReticle, bool updateHueThumb)
         {
             try
@@ -263,17 +267,22 @@ namespace OpenCW.UI
                 SelectedGreen = g;
                 SelectedBlue = b;
 
-                // 1. Update pure Hue background of 2D SV Box
-                if (StopHueColor != null)
+                // 1. Update pure Hue background of 2D SV Box only if Hue actually changed
+                if (StopHueColor != null && Math.Abs(_hue - _lastRenderedHue) > 0.05)
                 {
+                    _lastRenderedHue = _hue;
                     var (pureR, pureG, pureB) = HsvToRgb(_hue, 1.0, 1.0);
                     StopHueColor.Color = Color.FromRgb(pureR, pureG, pureB);
                 }
 
-                // 2. Update New Color Preview Box
+                // 2. Update New Color Preview Box with reusable brush (0 allocations)
                 if (BrdNewColor != null)
                 {
-                    BrdNewColor.Background = new SolidColorBrush(Color.FromRgb(r, g, b));
+                    _newColorBrush.Color = Color.FromRgb(r, g, b);
+                    if (!ReferenceEquals(BrdNewColor.Background, _newColorBrush))
+                    {
+                        BrdNewColor.Background = _newColorBrush;
+                    }
                 }
 
                 // 3. Update Text Inputs if requested
@@ -303,8 +312,14 @@ namespace OpenCW.UI
                     Canvas.SetLeft(HueThumb, Math.Clamp(thumbX, 0, GridHueBar.ActualWidth - HueThumb.Width));
                 }
 
-                // 6. Broadcast Real-time Live Preview to physical keyboard hardware!
-                ColorPreviewChanged?.Invoke(r, g, b);
+                // 6. Broadcast Real-time Live Preview only if RGB integer values actually changed
+                if (r != _lastReportedR || g != _lastReportedG || b != _lastReportedB)
+                {
+                    _lastReportedR = r;
+                    _lastReportedG = g;
+                    _lastReportedB = b;
+                    ColorPreviewChanged?.Invoke(r, g, b);
+                }
             }
             catch
             {

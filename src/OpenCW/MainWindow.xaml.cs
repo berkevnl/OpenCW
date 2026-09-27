@@ -222,8 +222,7 @@ namespace OpenCW
         protected override void OnDeactivated(EventArgs e)
         {
             base.OnDeactivated(e);
-            Hide();
-            MemoryOptimizer.TrimMemory();
+            // Çarpıya basılmadığı sürece pencerenin kapanmaması için OnDeactivated otomatik gizleme kaldırıldı
         }
 
         private void BtnCloseToTray_Click(object sender, RoutedEventArgs e)
@@ -407,13 +406,50 @@ namespace OpenCW
                 Owner = this
             };
 
-            // Renk seçicide gezinirken donanımda gerçek zamanlı canlı önizleme
+            // Donanım WMI haberleşmesini arka plan iş parçacığına taşıyıp arayüzün (UI) 0ms kasmadan çalışmasını sağlıyoruz
+            (byte R, byte G, byte B)? pendingColor = null;
+            int isSendingHardware = 0;
+
+            void ScheduleHardwarePreview((byte R, byte G, byte B) rgb)
+            {
+                pendingColor = rgb;
+                if (Interlocked.CompareExchange(ref isSendingHardware, 1, 0) == 0)
+                {
+                    System.Threading.Tasks.Task.Run(async () =>
+                    {
+                        try
+                        {
+                            while (pendingColor.HasValue)
+                            {
+                                var current = pendingColor.Value;
+                                pendingColor = null;
+
+                                if (_brightness > 0 && (_currentLedMode == LedMode.Static || _currentLedMode == LedMode.Breathing))
+                                {
+                                    _bridge.SetAllKeyboardLed(_currentLedMode, _brightness, current.R, current.G, current.B);
+                                }
+
+                                // Donanım veri yolunu (EC SMI) tıkamamak için kısa bekleme
+                                await System.Threading.Tasks.Task.Delay(60);
+                            }
+                        }
+                        catch { }
+                        finally
+                        {
+                            Interlocked.Exchange(ref isSendingHardware, 0);
+                            if (pendingColor.HasValue)
+                            {
+                                ScheduleHardwarePreview(pendingColor.Value);
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Renk seçicide gezinirken donanımda asenkron gerçek zamanlı canlı önizleme
             picker.ColorPreviewChanged += (r, g, b) =>
             {
-                if (_brightness > 0 && (_currentLedMode == LedMode.Static || _currentLedMode == LedMode.Breathing))
-                {
-                    _bridge.SetAllKeyboardLed(_currentLedMode, _brightness, r, g, b);
-                }
+                ScheduleHardwarePreview((r, g, b));
             };
 
             if (picker.ShowDialog() == true)
